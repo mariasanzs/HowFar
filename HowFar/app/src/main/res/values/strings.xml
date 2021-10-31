@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HowFar</string>
+    <string name="shared_preferences_file">howFarPreferences</string>
 </resources>
