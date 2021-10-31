@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void setHelloText(String nickname) {
-        if (nickname.trim() == "") {
+        if (nickname.trim().equals("")) {
             helloText.setText("Hello!");
         } else {
             helloText.setText("Hello " + nickname + "!");
@@ -84,8 +84,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        helloText.setText("Hello " + nameField.getText() + "!");
-        viewModel.nicknameChanged(nameField.getText().toString());
+        String name = nameField.getText().toString();
+        setHelloText(name);
+        viewModel.nicknameChanged(name);
     }
 
     @Override
