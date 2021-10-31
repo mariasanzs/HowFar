@@ -4,15 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activities.MainActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/helloTextView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Hello!"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/nameField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:hint="Enter your nickname"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="@+id/helloTextView"
+        app:layout_constraintStart_toStartOf="@+id/helloTextView"
+        app:layout_constraintTop_toBottomOf="@+id/helloTextView" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/nameField"
+        app:layout_constraintStart_toStartOf="@+id/nameField"
+        app:layout_constraintTop_toBottomOf="@+id/nameField">
+
+        <Button
+            android:id="@+id/joinMeetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/sea_blue"
+            android:layout_marginBottom="10dp"
+            android:text="Join Meet" />
+
+        <Button
+            android:id="@+id/createMeetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/sea_blue"
+            android:text="Create Meet" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
