@@ -3,6 +3,7 @@ package com.example.howfar.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
@@ -20,8 +22,12 @@ import com.example.howfar.viewmodels.MainActivityViewModel;
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
     private Button joinMeetButton;
+    private Button goJoinFormButton;
+    private Button cancelJoinFormButton;
     private EditText nameField;
     private TextView helloText;
+    private View tintView;
+    private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
 
     @Override
@@ -39,6 +45,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void initializeViews() {
+        tintView = findViewById(R.id.tintView);
+        tintView.setVisibility(View.GONE);
+        tintView.setAlpha(0.0f);
+        joinMeetForm = findViewById(R.id.joinFormView);
+        joinMeetForm.setVisibility(View.GONE);
+        joinMeetForm.setAlpha(1.0f);
+        goJoinFormButton = findViewById(R.id.goJoinFormButton);
+        goJoinFormButton.setOnClickListener(view -> goJoinFormButtonPressed());
+        cancelJoinFormButton = findViewById(R.id.cancelJoinFormButton);
+        cancelJoinFormButton.setOnClickListener(view -> hideJoinForm());
         createMeetButton = findViewById(R.id.createMeetButton);
         createMeetButton.setOnClickListener(view -> createMeetButtonPressed());
         joinMeetButton = findViewById(R.id.joinMeetButton);
@@ -53,6 +69,30 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }
     }
 
+    private void showJoinForm() {
+        tintView.setVisibility(View.VISIBLE);
+        tintView.animate().alpha(0.5f);
+        joinMeetForm.setVisibility(View.VISIBLE);
+        joinMeetForm.animate().alpha(1.0f);
+        nameField.setEnabled(false);
+        createMeetButton.setEnabled(false);
+        joinMeetButton.setEnabled(false);
+    }
+
+    private void hideJoinForm() {
+        joinMeetForm.setVisibility(View.GONE);
+        tintView.setVisibility(View.GONE);
+        joinMeetForm.setAlpha(0.0f);
+        tintView.setAlpha(0.0f);
+        nameField.setEnabled(true);
+        createMeetButton.setEnabled(true);
+        joinMeetButton.setEnabled(true);
+    }
+
+    private void goJoinFormButtonPressed() {
+
+    }
+
     private boolean validateNameField() {
         if (nameField.getText().toString().matches("^[a-zA-Z0-9]{4,}$")) {
             return true;
@@ -65,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (nickname.trim().equals("")) {
             helloText.setText("Hello!");
         } else {
-            helloText.setText("Hello " + nickname + "!");
+            helloText.setText("Hello " + nickname.trim() + "!");
         }
     }
 
@@ -74,7 +114,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void joinMeetButtonPressed() {
-        validateNameField();
+        if (validateNameField()) {
+            showJoinForm();
+        }
     }
 
     @Override
@@ -100,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(nameField.getWindowToken(), 0);
             nameField.clearFocus();
+            joinMeetButton.clearFocus();
+            createMeetButton.clearFocus();
         }
         return false;
     }
