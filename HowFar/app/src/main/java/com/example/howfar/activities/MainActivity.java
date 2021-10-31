@@ -47,8 +47,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private void initializeViews() {
         tintView = findViewById(R.id.tintView);
         tintView.setVisibility(View.GONE);
+        tintView.setAlpha(0.0f);
         joinMeetForm = findViewById(R.id.joinFormView);
         joinMeetForm.setVisibility(View.GONE);
+        joinMeetForm.setAlpha(1.0f);
         goJoinFormButton = findViewById(R.id.goJoinFormButton);
         goJoinFormButton.setOnClickListener(view -> goJoinFormButtonPressed());
         cancelJoinFormButton = findViewById(R.id.cancelJoinFormButton);
@@ -69,15 +71,19 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     private void showJoinForm() {
         tintView.setVisibility(View.VISIBLE);
+        tintView.animate().alpha(0.5f);
         joinMeetForm.setVisibility(View.VISIBLE);
+        joinMeetForm.animate().alpha(1.0f);
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
     }
 
     private void hideJoinForm() {
-        tintView.setVisibility(View.GONE);
         joinMeetForm.setVisibility(View.GONE);
+        tintView.setVisibility(View.GONE);
+        joinMeetForm.setAlpha(0.0f);
+        tintView.setAlpha(0.0f);
         nameField.setEnabled(true);
         createMeetButton.setEnabled(true);
         joinMeetButton.setEnabled(true);
@@ -99,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (nickname.trim().equals("")) {
             helloText.setText("Hello!");
         } else {
-            helloText.setText("Hello " + nickname + "!");
+            helloText.setText("Hello " + nickname.trim() + "!");
         }
     }
 
