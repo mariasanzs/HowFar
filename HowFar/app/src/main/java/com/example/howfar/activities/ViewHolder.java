@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.howfar.R;
+
 public class ViewHolder extends RecyclerView.ViewHolder {
 
     // Holds references to individual item views
@@ -25,7 +27,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         title = itemView.findViewById(R.id.title);
     }
 
-    void bindValues(Place place, Boolean isSelected) {
+    void bindValues(Place place) {
         // give values to the elements contained in the item view
         title.setText(place.getTitle());
     }

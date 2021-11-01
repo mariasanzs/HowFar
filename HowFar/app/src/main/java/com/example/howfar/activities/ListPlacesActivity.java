@@ -19,6 +19,7 @@ import java.util.List;
 public class ListPlacesActivity extends AppCompatActivity {
     private static final List<Place> listofcinemas = new ArrayList<>();
     private RecyclerView recyclerView;
+    private RecyclerViewAdapter recyclerViewAdapter;
     private boolean listofitemsinitialized;
 
     @Override
@@ -27,6 +28,10 @@ public class ListPlacesActivity extends AppCompatActivity {
         setContentView(R.layout.list_of_places);
         initListOfCinemas();
 
+    }
+
+    private void initRecyclerView(){
+        recyclerView = findViewById(R.id.recyclerView);
     }
 
 
