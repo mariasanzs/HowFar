@@ -1,6 +1,7 @@
 package com.example.howfar.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Layout;
@@ -79,6 +80,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinMeetButton.setEnabled(false);
     }
 
+    private void showListCinemas(){
+        Intent intent = new Intent( MainActivity.this, ListPlacesActivity.class);
+        startActivity(intent);
+    }
+
     private void hideJoinForm() {
         joinMeetForm.setVisibility(View.GONE);
         tintView.setVisibility(View.GONE);
@@ -110,7 +116,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-        validateNameField();
+
+        if (validateNameField()){
+            showListCinemas();
+        }
     }
 
     private void joinMeetButtonPressed() {
