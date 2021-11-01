@@ -29,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // this method has to actually inflate the item view and return the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.id.place_layout, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.id.l, parent, false);
         return new ViewHolder(context, v);
     }
 
