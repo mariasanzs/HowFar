@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.howfar.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +26,6 @@ public class ListPlacesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
         initListOfCinemas();
-
 
     }
 
@@ -81,4 +82,3 @@ public class ListPlacesActivity extends AppCompatActivity {
 
 
 
-}
