@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // this method has to actually inflate the item view and return the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.id.place_layout, parent, false);
         return new ViewHolder(context, v);
     }
 
