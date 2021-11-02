@@ -3,6 +3,7 @@ package com.example.howfar.activities;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
@@ -27,17 +28,16 @@ public class ListPlacesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
         initListOfCinemas();
+        initRecyclerView();
 
     }
 
     private void initRecyclerView(){
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerViewAdapter = new RecyclerViewAdapter(this,listofcinemas);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
-
-
-
-
-
 
     private void initListOfCinemas() {
 

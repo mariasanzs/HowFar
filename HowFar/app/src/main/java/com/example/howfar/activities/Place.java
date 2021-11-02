@@ -15,11 +15,10 @@ public class Place {
     public String getTitle() {
         return title;
     }
-
     public double getLongitude() {
         return longitude;
     }
-     public  double getLatitude(){
+    public  double getLatitude(){
         return  latitude;
      }
 }

@@ -3,6 +3,7 @@ package com.example.howfar.activities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Layout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,18 +18,20 @@ import com.example.howfar.R;
 
 public class ViewHolder extends RecyclerView.ViewHolder {
 
-    // Holds references to individual item views
+    // Holds references to individual place views
     Context context;
     TextView title;
+    View cardLayout;
 
-    public ViewHolder(Context ctxt, View itemView) {
-        super(itemView);
+    public ViewHolder(Context ctxt, View placeView) {
+        super(placeView);
         context = ctxt;
-        title = itemView.findViewById(R.id.title);
+        title = placeView.findViewById(R.id.title);
+        cardLayout = placeView.findViewById(R.id.cardview);
     }
 
     void bindValues(Place place) {
-        // give values to the elements contained in the item view
+        // give values to the elements contained in the place view
         title.setText(place.getTitle());
     }
 }

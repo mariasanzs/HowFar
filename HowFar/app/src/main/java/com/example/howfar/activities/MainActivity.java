@@ -2,10 +2,15 @@ package com.example.howfar.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -13,12 +18,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
 import com.example.howfar.viewmodels.MainActivityViewModel;
+
+import java.util.concurrent.ExecutorService;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
@@ -30,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private View tintView;
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
+    Handler handler;
+    ExecutorService es;
+
+    private static final String URL_CINEMAS = "https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=json&file=7650046&filename=208862-7650046-ocio_salas&mgmtid=842385ce457a8410VgnVCM2000000c205a0aRCRD&preview=full";
+    private static final String CONTENT_TYPE_JSON = "application/json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +50,20 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         setContentView(R.layout.activity_main);
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         initializeViews();
+        // Define the handler that will receive the information from the background thread:
+        handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                // message received from background thread: load complete (or failure)
+                String string_result;
+                super.handleMessage(msg);
+                if ((string_result = msg.getData().getString("text")) != null) {
+                    
+
+                }
+            }
+        };
+
     }
 
     @Override
@@ -81,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void showListCinemas(){
-        Intent intent = new Intent( MainActivity.this, ListPlacesActivity.class);
+        Intent intent = new Intent(this  , ListPlacesActivity.class);
         startActivity(intent);
     }
 
@@ -116,8 +143,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-
         if (validateNameField()){
+            LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
+            es.execute(loadURLContentsjson);
             showListCinemas();
         }
     }

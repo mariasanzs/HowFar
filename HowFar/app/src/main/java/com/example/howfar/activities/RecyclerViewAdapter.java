@@ -6,8 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.howfar.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static final String TAG = "ListOfItems, MyAdapter";
 
-    private List<Place> places;
+    private List<Place> places = new ArrayList<>();
     Context context;
 
 
@@ -29,7 +32,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // this method has to actually inflate the item view and return the view holder
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.id.l, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.place_layout, parent, false);
         return new ViewHolder(context, v);
     }
 
@@ -40,6 +43,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
         // (values corresponding to the item in 'position')
         final Place place = places.get(position);
         holder.bindValues(place);
+        holder.parentlayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context,"Hola", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     @Override
