@@ -1,12 +1,15 @@
 package com.example.howfar.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
+import com.example.howfar.adapter.RecyclerViewAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,68 +21,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListPlacesActivity extends AppCompatActivity {
-    private static final List<Place> listofcinemas = new ArrayList<>();
+    private static List<Place> listofcinemas = new ArrayList<>();
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     private boolean listofitemsinitialized;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
-        initListOfCinemas();
+        intent = getIntent();
+        listofcinemas = (ArrayList<Place>)getIntent().getSerializableExtra("places");
         initRecyclerView();
 
     }
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapter(this,listofcinemas);
+        recyclerViewAdapter = new RecyclerViewAdapter(this, listofcinemas);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    private void initListOfCinemas() {
 
-        if (listofitemsinitialized == false) {
-            try {
-                JSONObject obj = new JSONObject(loadJSONFromAsset());
-                // fetch JSONObject named employee
-                JSONArray graph = obj.getJSONArray("@graph");
-                for (int i = 0; i < graph.length(); i++) {
-                    // create a JSONObject for fetching single user data
-                    JSONObject cinema = graph.getJSONObject(i);
-                    String title = cinema.getString("title");
-                    JSONObject location = cinema.getJSONObject("location");
-                    double latitude = location.getDouble("latitude");
-                    double longitude = location.getDouble("longitude");
-                    listofcinemas.add(new Place(title,longitude,latitude));
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            listofitemsinitialized = true;
-        }
-    }
-    public String loadJSONFromAsset(){
-        String json = null;
-        try {
-            InputStream is = getAssets().open("cinemas.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
+}
 
 
-    }
 
 
 

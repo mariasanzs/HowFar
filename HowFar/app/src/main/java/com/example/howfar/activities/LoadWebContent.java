@@ -79,6 +79,7 @@ public class LoadWebContent implements Runnable {
         
         if ("".equals(response) == false) {
             msg_data.putString("text", response);
+
         }
         msg.sendToTarget();
     }

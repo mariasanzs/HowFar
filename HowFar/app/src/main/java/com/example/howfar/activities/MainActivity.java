@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
@@ -26,7 +27,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.howfar.R;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
@@ -40,17 +49,20 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private MainActivityViewModel viewModel;
     Handler handler;
     ExecutorService es;
+    private List<Place> places = new ArrayList<>();
+    private boolean listofcinemasinitialized = false;
+    public static final String LOGSLOADWEBCONTENT = "LOGSLOADWEBCONTENT";
 
-    private static final String URL_CINEMAS = "https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=json&file=7650046&filename=208862-7650046-ocio_salas&mgmtid=842385ce457a8410VgnVCM2000000c205a0aRCRD&preview=full";
-    private static final String CONTENT_TYPE_JSON = "application/json";
+    private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
+    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        es = Executors.newSingleThreadExecutor();
         initializeViews();
-        // Define the handler that will receive the information from the background thread:
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -58,13 +70,39 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                 String string_result;
                 super.handleMessage(msg);
                 if ((string_result = msg.getData().getString("text")) != null) {
-                    
+                    if (listofcinemasinitialized == false) {
+                        Log.d(LOGSLOADWEBCONTENT, "message received from background thread");
+                        try {
+                            Log.d(LOGSLOADWEBCONTENT, string_result);
+                            JSONObject obj = new JSONObject(string_result);
+                            // fetch JSONObject named employee
+                            JSONArray graph = obj.getJSONArray("@graph");
+                            for (int i = 0; i < graph.length(); i++) {
+                                // create a JSONObject for fetching single user data
+                                JSONObject cinema = graph.getJSONObject(i);
+                                String title = cinema.getString("title");
+                                JSONObject location = cinema.getJSONObject("location");
+                                double latitude = location.getDouble("latitude");
+                                double longitude = location.getDouble("longitude");
+                                Log.d(LOGSLOADWEBCONTENT, String.valueOf(longitude));
+                                places.add(new Place(title,longitude,latitude));
+                            }
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        listofcinemasinitialized = true;
+                        showListCinemas();
+                    }
                 }
+
             }
         };
 
+
     }
+
+
 
     @Override
     protected void onStop() {
@@ -109,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     private void showListCinemas(){
         Intent intent = new Intent(this  , ListPlacesActivity.class);
+        Bundle args = new Bundle();
+        intent.putExtra("places", (Serializable) places);
         startActivity(intent);
     }
 
@@ -146,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (validateNameField()){
             LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
             es.execute(loadURLContentsjson);
-            showListCinemas();
         }
     }
 

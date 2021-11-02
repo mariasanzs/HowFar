@@ -1,4 +1,4 @@
-package com.example.howfar.activities;
+package com.example.howfar.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
+import com.example.howfar.activities.Place;
 
 public class ViewHolder extends RecyclerView.ViewHolder {
 

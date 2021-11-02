@@ -1,6 +1,8 @@
 package com.example.howfar.activities;
 
-public class Place {
+import java.io.Serializable;
+
+public class Place implements Serializable {
     private String title;
     private double longitude;
     private double latitude;
