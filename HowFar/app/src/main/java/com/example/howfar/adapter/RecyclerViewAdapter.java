@@ -47,7 +47,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
             @Override
             public void onClick(View view) {
                 Toast.makeText(context,"Hola", Toast.LENGTH_SHORT).show();
-                Intent intent2 = new Intent(this,Class.ConfirmMeetActivity);
+                Intent intent2 = null;
+                intent2 = new Intent(this,); 
                 intent2.putExtra("longitude", place.getLongitude());
                 intent2.putExtra("latitude", place.getLatitude());
                 startActivity(intent2);
