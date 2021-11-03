@@ -15,12 +15,15 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     Context context;
     TextView title;
     View cardLayout;
+    private RecyclerViewAdapter.OnClickListener clickListener;
 
-    public ViewHolder(Context ctxt, View placeView) {
+    public ViewHolder(Context ctxt, View placeView, RecyclerViewAdapter.OnClickListener listener) {
         super(placeView);
         context = ctxt;
         title = placeView.findViewById(R.id.title);
         cardLayout = placeView.findViewById(R.id.cardview);
+        clickListener = listener;
+        placeView.setOnClickListener(view -> this.clickListener.onItemClick(getAdapterPosition()));
     }
 
     void bindValues(Place place) {

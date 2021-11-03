@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class CreateMeetActivity extends AppCompatActivity {
+public class CreateMeetActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
 
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
@@ -97,13 +97,22 @@ public class CreateMeetActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapter(this, places);
+        recyclerViewAdapter = new RecyclerViewAdapter(this, places, this);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
 
+    @Override
+    public void onItemClick(int position) {
+        Place place = listofplaces.get(position);
+        Intent intent = new Intent(this, ConfirmMeetActivity.class);
+        intent.putExtra("placeName", place.getTitle());
+        intent.putExtra("placeLatitude", place.getLatitude());
+        intent.putExtra("placeLongitude", place.getLongitude());
+        startActivity(intent);
+    }
 }
 
 

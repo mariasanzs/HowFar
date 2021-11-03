@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-        toggle_buttons(false);
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
             startActivity(intent);

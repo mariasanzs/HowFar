@@ -1,7 +1,6 @@
 package com.example.howfar.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -14,14 +13,15 @@ import com.google.android.gms.maps.model.LatLng;
 public class ConfirmMeetActivity extends AppCompatActivity {
     private Intent intent;
     private MapsFragment mapFragment;
-    private TextView textView;
+    private TextView placeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm);
+        placeName = findViewById(R.id.placeName);
         intent = getIntent();
-        openGMaps();
+        placeName.setText(intent.getStringExtra("placeName"));
         setupMapFragment();
     }
 
@@ -30,25 +30,14 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void openGMaps() {
-        Double lat = intent.getDoubleExtra("latitude", 0);
-        Double longit = intent.getDoubleExtra("longitude", 0);
-        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + longit);
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-        startActivity(mapIntent);
-    }
-
     private void setupMapFragment() {
         mapFragment = new MapsFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragmentContainerView2, mapFragment)
+                .add(R.id.fragmentContainerView, mapFragment)
                 .commit();
-        Double lat = intent.getDoubleExtra("latitude", 0);
-        Double longit = intent.getDoubleExtra("longitude", 0);
+        Double lat = intent.getDoubleExtra("placeLatitude", 0);
+        Double longit = intent.getDoubleExtra("placeLongitude", 0);
         mapFragment.setMarker(new LatLng(lat, longit));
     }
-
-
 }
