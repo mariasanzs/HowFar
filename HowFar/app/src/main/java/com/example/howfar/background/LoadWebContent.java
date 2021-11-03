@@ -1,4 +1,4 @@
-package com.example.howfar.activities;
+package com.example.howfar.background;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;

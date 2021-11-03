@@ -20,11 +20,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListPlacesActivity extends AppCompatActivity {
-    private static List<Place> listofcinemas = new ArrayList<>();
+public class CreateMeetActivity extends AppCompatActivity {
+
+    private static List<Place> listofplaces = new ArrayList<>();
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
-    private boolean listofitemsinitialized;
     private Intent intent;
 
     @Override
@@ -32,14 +32,14 @@ public class ListPlacesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
         intent = getIntent();
-        listofcinemas = (ArrayList<Place>)getIntent().getSerializableExtra("places");
+        listofplaces = (ArrayList<Place>)getIntent().getSerializableExtra("places");
         initRecyclerView();
 
     }
 
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapter(this, listofcinemas);
+        recyclerViewAdapter = new RecyclerViewAdapter(this, listofplaces);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
