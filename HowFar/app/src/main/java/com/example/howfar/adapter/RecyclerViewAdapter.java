@@ -10,11 +10,8 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
-import com.example.howfar.activities.ConfirmMeetActivity;
-import com.example.howfar.activities.CreateMeetActivity;
 import com.example.howfar.activities.Place;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,15 +42,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
         // this method actually gives values to the elements of the view holder
         // (values corresponding to the item in 'position')
         final Place place = places.get(position);
-        Intent intent2 = new Intent(this,Class.ConfirmMeetActivity);
-        intent2.putExtra("longitude", place.getLongitude());
-        intent2.putExtra("latitude", place.getLatitude());
-        startActivity(intent2);
         holder.bindValues(place);
         holder.cardLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(context,"Hola", Toast.LENGTH_SHORT).show();
+                Intent intent2 = new Intent(this,Class.ConfirmMeetActivity);
+                intent2.putExtra("longitude", place.getLongitude());
+                intent2.putExtra("latitude", place.getLatitude());
+                startActivity(intent2);
 
             }
         });

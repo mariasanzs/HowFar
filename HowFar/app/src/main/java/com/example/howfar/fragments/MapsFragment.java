@@ -59,12 +59,6 @@ public class MapsFragment extends Fragment {
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
-    public void setType(int type) {
-        mapType = type;
-        if (googleMap != null) {
-            googleMap.setMapType(type);
-        }
-    }
 
     @Nullable
     @Override
