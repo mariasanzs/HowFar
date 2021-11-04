@@ -30,7 +30,6 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
 
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
-    private Intent intent;
     Executor es;
     Handler handler;
     private List<Place> places = new ArrayList<>();
@@ -106,7 +105,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
 
     @Override
     public void onItemClick(int position) {
-        Place place = listofplaces.get(position);
+        Place place = places.get(position);
         Intent intent = new Intent(this, ConfirmMeetActivity.class);
         intent.putExtra("placeName", place.getTitle());
         intent.putExtra("placeLatitude", place.getLatitude());
