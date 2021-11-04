@@ -1,5 +1,6 @@
 package com.example.howfar.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,10 +40,14 @@ public class CreateMeetActivity extends AppCompatActivity {
     private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setIcon(R.mipmap.ic_launcher);
+        progressDialog.setMessage("Loading...");
         es = Executors.newSingleThreadExecutor();
         handler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -52,12 +57,15 @@ public class CreateMeetActivity extends AppCompatActivity {
                 if ((string_result = msg.getData().getString("text")) != null) {
                     initCreateMeetActivity(string_result);
                     initRecyclerView();
+                    progressDialog.dismiss();
                 }
             }
         };
         LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
         es.execute(loadURLContentsjson);
+        progressDialog.show();
 
+        //Obtiene referencia en Layout de WebView.
 
 
     }
