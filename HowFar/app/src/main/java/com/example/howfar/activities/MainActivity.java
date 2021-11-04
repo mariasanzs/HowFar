@@ -4,11 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,24 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
-import com.example.howfar.background.LoadWebContent;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
@@ -59,21 +48,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        es = Executors.newSingleThreadExecutor();
         initializeViews();
-        handler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                String string_result;
-                super.handleMessage(msg);
-                if ((string_result = msg.getData().getString("text")) != null) {
-                    initCreateMeetActivity(string_result);
-                }
-                }
-        };
     }
-
-
 
     @Override
     protected void onStop() {
@@ -116,11 +92,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinMeetButton.setEnabled(false);
     }
 
-    private void launchCreateMeetActivity(){
-        Intent intent = new Intent(this  , CreateMeetActivity.class);
-        intent.putExtra("places", (Serializable) places);
-        startActivity(intent);
-    }
 
     private void hideJoinForm() {
         joinMeetForm.setVisibility(View.GONE);
@@ -155,35 +126,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private void createMeetButtonPressed() {
         toggle_buttons(false);
         if (validateNameField()){
-            LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
-            es.execute(loadURLContentsjson);
-        }
-    }
-    private void initCreateMeetActivity(String string_result){
-        if (listofcinemasinitialized == false) {
-            Log.d(LOGSLOADWEBCONTENT, "message received from background thread");
-            try {
-                Log.d(LOGSLOADWEBCONTENT, string_result);
-                JSONObject obj = new JSONObject(string_result);
-                // fetch JSONObject named employee
-                JSONArray graph = obj.getJSONArray("@graph");
-                for (int i = 0; i < graph.length(); i++) {
-                    // create a JSONObject for fetching single user data
-                    JSONObject cinema = graph.getJSONObject(i);
-                    String title = cinema.getString("title");
-                    JSONObject location = cinema.getJSONObject("location");
-                    double latitude = location.getDouble("latitude");
-                    double longitude = location.getDouble("longitude");
-                    Log.d(LOGSLOADWEBCONTENT, String.valueOf(longitude));
-                    places.add(new Place(title,longitude,latitude));
-                }
+            Intent intent = new Intent(this  , CreateMeetActivity.class);
+            startActivity(intent);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            listofcinemasinitialized = true;
-            launchCreateMeetActivity();
-            toggle_buttons(true);
         }
     }
 
