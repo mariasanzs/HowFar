@@ -1,9 +1,10 @@
 package com.example.howfar.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -19,6 +20,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.howfar.R;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
     private Button joinMeetButton;
@@ -29,6 +34,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private View tintView;
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
+    Handler handler;
+    ExecutorService es;
+    private List<Place> places = new ArrayList<>();
+    private boolean listofcinemasinitialized = false;
+    public static final String LOGSLOADWEBCONTENT = "LOGSLOADWEBCONTENT";
+    // To load content from the website
+    private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
+    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinMeetButton.setEnabled(false);
     }
 
+
     private void hideJoinForm() {
         joinMeetForm.setVisibility(View.GONE);
         tintView.setVisibility(View.GONE);
@@ -110,13 +124,23 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-        validateNameField();
+        toggle_buttons(false);
+        if (validateNameField()){
+            Intent intent = new Intent(this  , CreateMeetActivity.class);
+            startActivity(intent);
+
+        }
     }
 
     private void joinMeetButtonPressed() {
         if (validateNameField()) {
             showJoinForm();
         }
+    }
+    private void toggle_buttons(boolean state) {
+        // enable or disable buttons (depending on state)
+        createMeetButton.setEnabled(state);
+        joinMeetButton.setEnabled(state);
     }
 
     @Override
