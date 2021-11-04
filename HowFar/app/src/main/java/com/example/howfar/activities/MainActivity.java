@@ -34,14 +34,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private View tintView;
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
-    Handler handler;
-    ExecutorService es;
     private List<Place> places = new ArrayList<>();
     private boolean listofcinemasinitialized = false;
-    public static final String LOGSLOADWEBCONTENT = "LOGSLOADWEBCONTENT";
-    // To load content from the website
-    private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
-    private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-        toggle_buttons(false);
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
             startActivity(intent);
@@ -136,11 +129,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (validateNameField()) {
             showJoinForm();
         }
-    }
-    private void toggle_buttons(boolean state) {
-        // enable or disable buttons (depending on state)
-        createMeetButton.setEnabled(state);
-        joinMeetButton.setEnabled(state);
     }
 
     @Override
