@@ -3,7 +3,6 @@ package com.example.howfar.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -22,7 +21,6 @@ import com.example.howfar.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
@@ -35,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
     private List<Place> places = new ArrayList<>();
-    private boolean listofcinemasinitialized = false;
+    private String nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     private boolean validateNameField() {
         if (nameField.getText().toString().matches("^[a-zA-Z0-9]{4,}$")) {
+            nickname = nameField.getText().toString();
             return true;
         }
         nameField.setError("Nickname must contain at least 4 non special characters");
@@ -120,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private void createMeetButtonPressed() {
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
+            intent.putExtra("nickname",nickname);
             startActivity(intent);
 
         }
