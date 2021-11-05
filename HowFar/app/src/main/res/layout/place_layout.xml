@@ -4,13 +4,16 @@
     android:id="@+id/cardview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
     card_view:cardCornerRadius="10dp"
-    card_view:cardElevation="10dp">
+    android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    card_view:cardElevation="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="98dp"
+        android:layout_height="65dp"
         android:layout_margin="5dp"
         android:orientation="vertical">
 
@@ -19,7 +22,7 @@
             style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:singleLine="false"
             android:text="Placeholder for title" />
 
     </LinearLayout>
