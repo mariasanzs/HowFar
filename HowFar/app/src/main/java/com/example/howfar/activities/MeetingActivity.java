@@ -1,15 +1,23 @@
 package com.example.howfar.activities;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +30,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class MeetingActivity  extends AppCompatActivity {
+public class MeetingActivity  extends AppCompatActivity
+        implements LocationListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
     private PahoClient client;
     private String idMeeting ="02991";
     private Handler handler = new Handler();
@@ -32,6 +45,7 @@ public class MeetingActivity  extends AppCompatActivity {
     private Double lat;
     private Double longit;
     private MapsFragment mapFragment;
+    private LocationManager locationManager;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
@@ -44,22 +58,25 @@ public class MeetingActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.meeting_layout);
         fab = findViewById(R.id.fab);
-        topics.add(topic0);
-        topics.add(topic1);
-        intent = getIntent();
         mRecyclerView = findViewById(R.id.history_recycler_view);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        requestLocationPermissions();
+        initListOfTopics();
+        intent = getIntent();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new HistoryAdapter(new ArrayList<>());
         mRecyclerView.setAdapter(mAdapter);
+
         setupMapFragment();
 
-        if (intent.getBooleanExtra("meetingCreator",false)){
+        if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
             fab.setVisibility(View.VISIBLE);
             //Create id meeting
             //idMeeting = ...
-        } else{
+        } else {
             creator = false;
             fab.setVisibility(View.INVISIBLE);
             //Coger idmeeting de la actividad de join
@@ -67,21 +84,16 @@ public class MeetingActivity  extends AppCompatActivity {
 
         }
         fab.setOnClickListener(view -> sharingId());
-        client = new PahoClient(getApplication(),mAdapter,topics);
+        client = new PahoClient(getApplication(), mAdapter, topics);
         //client.subscribeToTopic();
 
     }
-    protected void onResume() {
-        handler.postDelayed(runnable = new Runnable() {
-            public void run() {
-                handler.postDelayed(runnable, delay);
-                Toast.makeText(MeetingActivity.this, "This method is run every 10 seconds",
-                        Toast.LENGTH_SHORT).show();
-                client.publishMessage(topics.get(0),"distancia");
-            }
-        }, delay);
-        super.onResume();
+
+    private void initListOfTopics() {
+        topics.add(topic0);
+        topics.add(topic1);
     }
+
     private void sharingId() {
         //FUNCIONA
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -100,6 +112,58 @@ public class MeetingActivity  extends AppCompatActivity {
         lat = intent.getDoubleExtra("placeLatitude", 0);
         longit = intent.getDoubleExtra("placeLongitude", 0);
         mapFragment.setMarker(new LatLng(lat, longit));
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Toast.makeText(MeetingActivity.this,
+                "Current location is " + location.getLongitude() + ":" + location.getLatitude(),
+                Toast.LENGTH_SHORT)
+            .show();
+    }
+
+    private void requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            enableLocation();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            return;
+        }
+
+        if (isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            enableLocation();
+        } else {
+            requestLocationPermissions();
+        }
+
+    }
+
+    private void enableLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 10, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
+        } else {
+            requestLocationPermissions();
+        }
+    }
+
+    private boolean isPermissionGranted(String[] grantPermissions, int[] grantResults,
+                                              String permission) {
+        for (int i = 0; i < grantPermissions.length; i++) {
+            if (permission.equals(grantPermissions[i])) {
+                return grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            }
+        }
+        return false;
     }
 
 }
