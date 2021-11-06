@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MeetingActivity  extends AppCompatActivity
         implements LocationListener,
@@ -46,6 +47,7 @@ public class MeetingActivity  extends AppCompatActivity
     private Double longit;
     private MapsFragment mapFragment;
     private LocationManager locationManager;
+    private UUID meetId;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
@@ -73,12 +75,11 @@ public class MeetingActivity  extends AppCompatActivity
 
         if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
-            fab.setVisibility(View.VISIBLE);
-            //Create id meeting
+            meetId = UUID.randomUUID();
+
             //idMeeting = ...
         } else {
             creator = false;
-            fab.setVisibility(View.INVISIBLE);
             //Coger idmeeting de la actividad de join
             //idMeeting=...
 
