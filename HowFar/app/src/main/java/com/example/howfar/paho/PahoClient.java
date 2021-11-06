@@ -9,7 +9,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -21,37 +20,36 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class PahoClient {
-    final String serverUri = "tcp://broker.hivemq.com:1883"; //Cambiar URL
+    final String serverUri = "tcp://broker.hivemq.com:1883";
     private final String preferencesFile;
     String lastWillMessage = "Goodbye!";
     MqttAndroidClient mqttAndroidClient;
     String clientId;
     String userNickname;
-    ArrayList<String> topics;
     private SharedPreferences preferences;
     private MutableLiveData<Float> lastReceivedDistance;
     private HistoryAdapter mAdapter;
     private final String NICKNAMEKEY = "userName";
+    ArrayList<String> clientTopics;
 
-    public PahoClient(Application application) {
+    public PahoClient(Application application, HistoryAdapter adapter, ArrayList<String> topics) {
         preferencesFile = application.getString(R.string.shared_preferences_file);
         preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
         userNickname = preferences.getString(NICKNAMEKEY, "");
         clientId = clientId + System.currentTimeMillis();
+        mAdapter =adapter;
+        clientTopics=topics;
         mqttAndroidClient = new MqttAndroidClient(application.getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     // Because Clean Session is true, we need to re-subscribe
-                    subscribeToTopic();
+                    subscribeToTopic(topics.get(0));
+                    subscribeToTopic(topics.get(1));
                 }
             }
 
@@ -77,7 +75,7 @@ public class PahoClient {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         byte[] payload = lastWillMessage.getBytes();
-        mqttConnectOptions.setWill(publishTopic,payload,0,false);
+        mqttConnectOptions.setWill("distance",payload,0,false);
         //mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setCleanSession(true);
 
@@ -93,7 +91,8 @@ public class PahoClient {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic();
+                    subscribeToTopic(topics.get(0));
+                    subscribeToTopic(topics.get(1));
                 }
 
                 @Override
@@ -113,7 +112,7 @@ public class PahoClient {
             mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("PAHO", "Subscribed to: " + subscriptionTopic);
+                    Log.d("PAHO", "Subscribed to: " + "distance");
                 }
 
                 @Override
@@ -129,7 +128,7 @@ public class PahoClient {
     private void addToHistory(String mainText) {
         System.out.println("LOG: " + mainText);
         mAdapter.add(mainText);
-        Snackbar.make(findViewById(android.R.id.content), mainText, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        //Snackbar.make(findViewById(android.R.id.content), mainText, Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
     }
 

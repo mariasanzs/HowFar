@@ -47,6 +47,7 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         toMeetActivity.putExtra("placeLongitude", longit);
         toMeetActivity.putExtra("placeName",placeTitle);
         toMeetActivity.putExtra("meetingCreator",true);
+        startActivity(toMeetActivity);
 
 
     }

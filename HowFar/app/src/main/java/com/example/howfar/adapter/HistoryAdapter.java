@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.howfar.R;
+
 import java.util.ArrayList;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
@@ -21,7 +23,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // Create View
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history, parent, false);
 
         return new ViewHolder(view);
     }
