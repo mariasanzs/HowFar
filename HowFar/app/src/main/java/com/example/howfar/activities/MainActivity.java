@@ -29,12 +29,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private Button goJoinFormButton;
     private Button cancelJoinFormButton;
     private EditText nameField;
+    private EditText joinId;
     private TextView helloText;
     private View tintView;
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
     private List<Place> places = new ArrayList<>();
     private String nickname;
+    private String joinIdMeeting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setOnKeyListener(this);
         helloText = findViewById(R.id.helloTextView);
         setHelloText(viewModel.getNickname());
+        joinId.findViewById(R.id.editTextTextPersonName2);
         if (viewModel.getNickname().trim() != "") {
             nameField.setText(viewModel.getNickname());
         }
@@ -83,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
+        joinIdMeeting = joinId.getText().toString();
+
     }
 
 
@@ -97,7 +102,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void goJoinFormButtonPressed() {
-
+        Intent i = new Intent(this, MeetingActivity.class);
+        i.putExtra("idMeeting",joinIdMeeting);
+        startActivity(i);
     }
 
     private boolean validateNameField() {

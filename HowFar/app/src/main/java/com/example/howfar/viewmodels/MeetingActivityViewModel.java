@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.telephony.SmsMessage;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -20,7 +19,6 @@ import com.example.howfar.paho.PahoClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class MeetingActivityViewModel extends AndroidViewModel implements LocationListener {
     private MutableLiveData<Participant> participants;
@@ -66,7 +64,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
         }
     }
 
-    public void initalizeMqttClient(UUID meetingId) {
+    public void initalizeMqttClient(String meetingId) {
         topics.add(meetingId.toString() + "/location");
         topics.add(meetingId.toString() + "/distance");
         pahoClient = new PahoClient(application, topics);
@@ -75,7 +73,10 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
         }
     }
 
-    public void publishMeetingPointLocation(String lat, String location) {
+    public void publishMeetingPointLocation(Double lat, Double longit) {
+        LatLng meetpoint = new LatLng(lat,longit);
+        meetingPointLocation.postValue(meetpoint);
+        pahoClient.publishMessage(topics.get(0),lat+":"+longit);
 
     }
 
@@ -83,7 +84,17 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     public void onLocationChanged(@NonNull Location location) {
         currentLocation.postValue(location);
         // Calcular distancia al sitio
+        Location meetingpoint = new Location("");
+        LatLng latlongmeeting = meetingPointLocation.getValue();
+        meetingpoint.setLatitude(latlongmeeting.latitude);
+        meetingpoint.setLongitude(latlongmeeting.longitude);
+        float fdistance = location.distanceTo(meetingpoint);
+        Integer distance = new Integer((int) fdistance);
         // Publicar distancia
+        String nickname = pahoClient.getUserNickname();
+        String messagecontent = nickname+":"+distance.toString();
+        pahoClient.publishMessage(topics.get(1),messagecontent);
+
     }
 
     private void onMessageArrived(MqttContent message) {

@@ -3,7 +3,6 @@ package com.example.howfar.viewmodels;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -12,6 +11,7 @@ import com.example.howfar.R;
 
 public class MainActivityViewModel extends AndroidViewModel {
     private String userNickname;
+    private String joinId;
     private SharedPreferences preferences;
     private String preferencesFile;
     private final String NICKNAMEKEY = "userName";

@@ -8,7 +8,6 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.howfar.R;
-import com.example.howfar.adapter.HistoryAdapter;
 import com.example.howfar.model.MqttContent;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -144,5 +143,8 @@ public class PahoClient {
             lastReceivedMessage = new MutableLiveData<>();
         }
         return lastReceivedMessage;
+    }
+    public String getUserNickname(){
+        return userNickname;
     }
 }

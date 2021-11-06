@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,8 +24,6 @@ import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
 import com.example.howfar.fragments.MapsFragment;
 import com.example.howfar.model.Participant;
-import com.example.howfar.paho.PahoClient;
-import com.example.howfar.viewmodels.MainActivityViewModel;
 import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -48,7 +44,7 @@ public class MeetingActivity  extends AppCompatActivity
     private Double longit;
     private MapsFragment mapFragment;
     private LocationManager locationManager;
-    private UUID meetId;
+    private String meetId;
     private MeetingActivityViewModel viewModel;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
@@ -75,14 +71,16 @@ public class MeetingActivity  extends AppCompatActivity
 
         if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
-            meetId = UUID.randomUUID();
-
-            //idMeeting = ...
+            meetId = UUID.randomUUID().toString();
             viewModel.initalizeMqttClient(meetId);
+            Double lat = intent.getDoubleExtra("placeLatitude",0);
+            Double longit = intent.getDoubleExtra("placeLongitude",0);
+            viewModel.publishMeetingPointLocation(lat,longit);
+
         } else {
             creator = false;
             //Coger idmeeting de la actividad de join
-            //idMeeting=...
+            meetId = intent.getStringExtra("idMeeting");
             viewModel.initalizeMqttClient(meetId);
             if (!viewModel.getMeetingPointLocation().hasObservers()) {
                 viewModel.getMeetingPointLocation().observe(this, latLng -> onMeetingPointLocationReceived(latLng));
@@ -92,7 +90,6 @@ public class MeetingActivity  extends AppCompatActivity
         viewModel.getParticipants().observe(this, participant -> onParticipantDistanceChanged(participant));
         viewModel.getCurrentLocation().observe(this, location -> onLocationChanged(location));
         fab.setOnClickListener(view -> sharingId());
-        //client.subscribeToTopic();
 
     }
 
@@ -148,10 +145,15 @@ public class MeetingActivity  extends AppCompatActivity
 
     private void onParticipantDistanceChanged(Participant participant) {
         // Añadir participant a la lista y refrescarla
+        String nickname = participant.nickname;
+        String distance = Integer.toString(participant.distanceToLocation);
+        String historymessage = nickname+":"+distance;
+        mAdapter.add(historymessage);
     }
 
     private void onMeetingPointLocationReceived(LatLng location) {
         // Meter un toast
+        Toast.makeText(this,"Meeting location recieved",Toast.LENGTH_SHORT);
         mapFragment.setMarker(location);
     }
 
