@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
+import com.example.howfar.fragments.MapsFragment;
 import com.example.howfar.paho.PahoClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -27,6 +29,9 @@ public class MeetingActivity  extends AppCompatActivity {
     private final String topic0 ="distance";
     private final String topic1 ="location";
     private boolean creator = false;
+    private Double lat;
+    private Double longit;
+    private MapsFragment mapFragment;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
@@ -47,6 +52,7 @@ public class MeetingActivity  extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new HistoryAdapter(new ArrayList<>());
         mRecyclerView.setAdapter(mAdapter);
+        setupMapFragment();
 
         if (intent.getBooleanExtra("meetingCreator",false)){
             creator = true;
@@ -76,12 +82,24 @@ public class MeetingActivity  extends AppCompatActivity {
         }, delay);
         super.onResume();
     }
-    private void sharingId(){
+    private void sharingId() {
         //FUNCIONA
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Click to share meetingID", idMeeting);
         clipboard.setPrimaryClip(clip);
+        Toast.makeText(MeetingActivity.this, "Meeting ID copied to clipboard!",
+                Toast.LENGTH_SHORT).show();
     }
 
+    private void setupMapFragment() {
+        mapFragment = new MapsFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.meetingMapFragment, mapFragment)
+                .commit();
+        lat = intent.getDoubleExtra("placeLatitude", 0);
+        longit = intent.getDoubleExtra("placeLongitude", 0);
+        mapFragment.setMarker(new LatLng(lat, longit));
+    }
 
 }
