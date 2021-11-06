@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.howfar.R;
 import com.example.howfar.adapter.RecyclerViewAdapter;
 import com.example.howfar.background.LoadWebContent;
+import com.example.howfar.model.Place;
 
 import org.json.JSONArray;
 import org.json.JSONException;

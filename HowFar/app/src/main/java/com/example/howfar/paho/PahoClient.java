@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
+import com.example.howfar.model.MqttContent;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -30,26 +31,25 @@ public class PahoClient {
     String clientId;
     String userNickname;
     private SharedPreferences preferences;
-    private MutableLiveData<Float> lastReceivedDistance;
-    private HistoryAdapter mAdapter;
+    private MutableLiveData<MqttContent> lastReceivedMessage;
     private final String NICKNAMEKEY = "userName";
     ArrayList<String> clientTopics;
 
-    public PahoClient(Application application, HistoryAdapter adapter, ArrayList<String> topics) {
+    public PahoClient(Application application, ArrayList<String> topics) {
         preferencesFile = application.getString(R.string.shared_preferences_file);
         preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
         userNickname = preferences.getString(NICKNAMEKEY, "");
         clientId = clientId + System.currentTimeMillis();
-        mAdapter =adapter;
-        clientTopics=topics;
+        clientTopics = topics;
         mqttAndroidClient = new MqttAndroidClient(application.getApplicationContext(), serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     // Because Clean Session is true, we need to re-subscribe
-                    subscribeToTopic(topics.get(0));
-                    subscribeToTopic(topics.get(1));
+                    for (String topic : clientTopics) {
+                        subscribeToTopic(topic);
+                    }
                 }
             }
 
@@ -60,10 +60,9 @@ public class PahoClient {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) {
-                String price = new String(message.getPayload());
-                Float priceFloat = new Float(price);
-                Log.d("PAHO", priceFloat.toString());
-                lastReceivedDistance.postValue(priceFloat);
+                String payload = new String(message.getPayload());
+                MqttContent mqttContent = new MqttContent(topic, payload);
+                lastReceivedMessage.postValue(mqttContent);
             }
 
             @Override
@@ -76,10 +75,7 @@ public class PahoClient {
         mqttConnectOptions.setAutomaticReconnect(true);
         byte[] payload = lastWillMessage.getBytes();
         mqttConnectOptions.setWill("distance",payload,0,false);
-        //mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setCleanSession(true);
-
-        addToHistory("Connecting to " + serverUri + "...");
 
         try {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
@@ -91,8 +87,9 @@ public class PahoClient {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic(topics.get(0));
-                    subscribeToTopic(topics.get(1));
+                    for (String topic : clientTopics) {
+                        subscribeToTopic(topic);
+                    }
                 }
 
                 @Override
@@ -107,29 +104,26 @@ public class PahoClient {
         }
     }
 
-    public void subscribeToTopic(String topic) {
+    private void subscribeToTopic(String topic) {
         try {
             mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("PAHO", "Subscribed to: " + "distance");
+                    log("Subscribed to " + topic);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("PAHO", "Failed to subscribe");
+                    log("Failed to subsribe");
                 }
             });
         } catch (MqttException e) {
             e.printStackTrace();
         }
-
     }
-    private void addToHistory(String mainText) {
-        System.out.println("LOG: " + mainText);
-        mAdapter.add(mainText);
-        //Snackbar.make(findViewById(android.R.id.content), mainText, Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
+    private void log(String mainText) {
+        System.out.println("LOG: " + mainText);
     }
 
     public void publishMessage(String topic, String publishMessage) {
@@ -139,20 +133,16 @@ public class PahoClient {
         message.setQos(0);
         try {
             mqttAndroidClient.publish(topic, message);
-            addToHistory("Message Published");
+            log("Published message " + message + " to topic " + topic);
         } catch (Exception e) {
             e.printStackTrace();
-            addToHistory(e.toString());
-        }
-        if (!mqttAndroidClient.isConnected()) {
-            addToHistory("Client not connected!");
         }
     }
 
-    public MutableLiveData<Float> getDistanceValue() {
-        if (lastReceivedDistance == null) {
-            lastReceivedDistance = new MutableLiveData<Float>();
+    public MutableLiveData<MqttContent> getLastReceivedMessage() {
+        if (lastReceivedMessage == null) {
+            lastReceivedMessage = new MutableLiveData<>();
         }
-        return lastReceivedDistance;
+        return lastReceivedMessage;
     }
 }

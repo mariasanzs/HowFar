@@ -18,13 +18,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
 import com.example.howfar.fragments.MapsFragment;
+import com.example.howfar.model.Participant;
 import com.example.howfar.paho.PahoClient;
+import com.example.howfar.viewmodels.MainActivityViewModel;
+import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -32,39 +36,35 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class MeetingActivity  extends AppCompatActivity
-        implements LocationListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private PahoClient client;
     private String idMeeting ="02991";
     private Handler handler = new Handler();
-    private final String topic0 ="distance";
-    private final String topic1 ="location";
+
     private boolean creator = false;
     private Double lat;
     private Double longit;
     private MapsFragment mapFragment;
     private LocationManager locationManager;
     private UUID meetId;
+    private MeetingActivityViewModel viewModel;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
-    ArrayList<String> topics = new ArrayList<>();
+
     Intent intent;
-    Runnable runnable;
-    int delay = 10000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.meeting_layout);
         fab = findViewById(R.id.fab);
         mRecyclerView = findViewById(R.id.history_recycler_view);
+        viewModel = new ViewModelProvider(this).get(MeetingActivityViewModel.class);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         requestLocationPermissions();
-        initListOfTopics();
         intent = getIntent();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -78,21 +78,22 @@ public class MeetingActivity  extends AppCompatActivity
             meetId = UUID.randomUUID();
 
             //idMeeting = ...
+            viewModel.initalizeMqttClient(meetId);
         } else {
             creator = false;
             //Coger idmeeting de la actividad de join
             //idMeeting=...
-
+            viewModel.initalizeMqttClient(meetId);
+            if (!viewModel.getMeetingPointLocation().hasObservers()) {
+                viewModel.getMeetingPointLocation().observe(this, latLng -> onMeetingPointLocationReceived(latLng));
+            }
         }
+
+        viewModel.getParticipants().observe(this, participant -> onParticipantDistanceChanged(participant));
+        viewModel.getCurrentLocation().observe(this, location -> onLocationChanged(location));
         fab.setOnClickListener(view -> sharingId());
-        client = new PahoClient(getApplication(), mAdapter, topics);
         //client.subscribeToTopic();
 
-    }
-
-    private void initListOfTopics() {
-        topics.add(topic0);
-        topics.add(topic1);
     }
 
     private void sharingId() {
@@ -112,21 +113,15 @@ public class MeetingActivity  extends AppCompatActivity
                 .commit();
         lat = intent.getDoubleExtra("placeLatitude", 0);
         longit = intent.getDoubleExtra("placeLongitude", 0);
-        mapFragment.setMarker(new LatLng(lat, longit));
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Toast.makeText(MeetingActivity.this,
-                "Current location is " + location.getLongitude() + ":" + location.getLatitude(),
-                Toast.LENGTH_SHORT)
-            .show();
+        if (lat != 0 && longit != 0) { // Not creator
+            mapFragment.setMarker(new LatLng(lat, longit));
+        }
     }
 
     private void requestLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            enableLocation();
+            viewModel.beginRequestingLocation();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
@@ -140,21 +135,24 @@ public class MeetingActivity  extends AppCompatActivity
         }
 
         if (isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            enableLocation();
+            viewModel.beginRequestingLocation();
         } else {
             requestLocationPermissions();
         }
 
     }
 
-    private void enableLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 10, this);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
-        } else {
-            requestLocationPermissions();
-        }
+    private void onLocationChanged(Location location) {
+        Toast.makeText(this, location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void onParticipantDistanceChanged(Participant participant) {
+        // Añadir participant a la lista y refrescarla
+    }
+
+    private void onMeetingPointLocationReceived(LatLng location) {
+        // Meter un toast
+        mapFragment.setMarker(location);
     }
 
     private boolean isPermissionGranted(String[] grantPermissions, int[] grantResults,

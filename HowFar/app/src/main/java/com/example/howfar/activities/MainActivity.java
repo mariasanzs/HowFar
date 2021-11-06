@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
+import com.example.howfar.model.Place;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
