@@ -72,10 +72,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setOnKeyListener(this);
         helloText = findViewById(R.id.helloTextView);
         setHelloText(viewModel.getNickname());
-        joinId.findViewById(R.id.editTextTextPersonName2);
         if (viewModel.getNickname().trim() != "") {
             nameField.setText(viewModel.getNickname());
         }
+        joinId= findViewById(R.id.nameField);
+        joinId.addTextChangedListener(this);
+        joinId.setOnKeyListener(this);
+
+
     }
 
     private void showJoinForm() {

@@ -72,10 +72,17 @@ public class MeetingActivity  extends AppCompatActivity
         if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
             meetId = UUID.randomUUID().toString();
-            viewModel.initalizeMqttClient(meetId);
+            viewModel.initalizeMqttClient(idMeeting);
             Double lat = intent.getDoubleExtra("placeLatitude",0);
             Double longit = intent.getDoubleExtra("placeLongitude",0);
-            viewModel.publishMeetingPointLocation(lat,longit);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //Write whatever to want to do after delay specified (1 sec)
+                    viewModel.publishMeetingPointLocation(lat,longit);
+                }
+            }, 1000);
+
 
         } else {
             creator = false;
@@ -139,8 +146,9 @@ public class MeetingActivity  extends AppCompatActivity
 
     }
 
-    private void onLocationChanged(Location location) {
+   private void onLocationChanged(Location location) {
         Toast.makeText(this, location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT).show();
+        //mapFragment.setMarker(new LatLng(location.getLatitude(),location.getLongitude()));
     }
 
     private void onParticipantDistanceChanged(Participant participant) {
@@ -149,6 +157,7 @@ public class MeetingActivity  extends AppCompatActivity
         String distance = Integer.toString(participant.distanceToLocation);
         String historymessage = nickname+":"+distance;
         mAdapter.add(historymessage);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void onMeetingPointLocationReceived(LatLng location) {

@@ -33,7 +33,6 @@ public class PahoClient {
     private MutableLiveData<MqttContent> lastReceivedMessage;
     private final String NICKNAMEKEY = "userName";
     ArrayList<String> clientTopics;
-
     public PahoClient(Application application, ArrayList<String> topics) {
         preferencesFile = application.getString(R.string.shared_preferences_file);
         preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
@@ -128,14 +127,17 @@ public class PahoClient {
     public void publishMessage(String topic, String publishMessage) {
         MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());
-        message.setRetained(false);
-        message.setQos(0);
+        message.setRetained(true);
+        message.setQos(2);
         try {
-            mqttAndroidClient.publish(topic, message);
-            log("Published message " + message + " to topic " + topic);
+            mqttAndroidClient.publish(topic,message);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+
+
     }
 
     public MutableLiveData<MqttContent> getLastReceivedMessage() {

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -28,6 +29,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     private Application application;
     private PahoClient pahoClient;
     private LocationManager locationManager;
+    final Handler handler = new Handler();
+
 
     public MeetingActivityViewModel(@NonNull Application application) {
         super(application);
@@ -75,13 +78,14 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
 
     public void publishMeetingPointLocation(Double lat, Double longit) {
         LatLng meetpoint = new LatLng(lat,longit);
+        meetingPointLocation = getMeetingPointLocation();
         meetingPointLocation.postValue(meetpoint);
         pahoClient.publishMessage(topics.get(0),lat+":"+longit);
-
     }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
+        currentLocation = getCurrentLocation();
         currentLocation.postValue(location);
         // Calcular distancia al sitio
         Location meetingpoint = new Location("");
@@ -98,6 +102,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     }
 
     private void onMessageArrived(MqttContent message) {
+        participants = getParticipants();
+        meetingPointLocation = getMeetingPointLocation();
         if (message.topic.contains("distance")) {
             String[] pieces = message.payload.split(":");
             if (pieces.length >= 2) {
