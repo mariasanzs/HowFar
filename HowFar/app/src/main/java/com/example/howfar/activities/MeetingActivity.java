@@ -39,9 +39,6 @@ public class MeetingActivity  extends AppCompatActivity
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private String idMeeting ="02991";
-    private Handler handler = new Handler();
-
     private boolean creator = false;
     private Double lat;
     private Double longit;
@@ -79,13 +76,13 @@ public class MeetingActivity  extends AppCompatActivity
         if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
             meetId = UUID.randomUUID().toString();
-            viewModel.initalizeMqttClient(idMeeting);
+            viewModel.initalizeMqttClient(meetId);
             Log.d("PAHOJOIN", "Localización publicada ");
         } else {
             creator = false;
             //Coger idmeeting de la actividad de join
             meetId = intent.getStringExtra("idMeeting");
-            viewModel.initalizeMqttClient(idMeeting);
+            viewModel.initalizeMqttClient(meetId);
             Log.d("PAHOJOIN","Se ha añadido el cliente");
         }
         Log.d("PAHOJOIN","LLega Aquí");
@@ -141,12 +138,10 @@ public class MeetingActivity  extends AppCompatActivity
         } else {
             requestLocationPermissions();
         }
-
     }
 
    private void onLocationChanged(Location location) {
         Toast.makeText(this, location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT).show();
-        //mapFragment.setMarker(new LatLng(location.getLatitude(),location.getLongitude()));
     }
 
     private void onParticipantDistanceChanged(Participant participant) {
@@ -191,6 +186,5 @@ public class MeetingActivity  extends AppCompatActivity
         } else {
             Toast.makeText(this, "An error ocurred", Toast.LENGTH_LONG).show();
         }
-
     }
 }

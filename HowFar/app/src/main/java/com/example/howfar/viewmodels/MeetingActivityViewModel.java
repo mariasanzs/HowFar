@@ -36,7 +36,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     private Application application;
     private PahoClient pahoClient;
     private LocationManager locationManager;
-    final Handler handler = new Handler();
 
 
     public MeetingActivityViewModel(@NonNull Application application) {
