@@ -1,6 +1,7 @@
 package com.example.howfar.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -48,6 +49,7 @@ public class MeetingActivity  extends AppCompatActivity
     private LocationManager locationManager;
     private String meetId;
     private MeetingActivityViewModel viewModel;
+    private ProgressDialog progressDialog;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
@@ -56,6 +58,10 @@ public class MeetingActivity  extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setIcon(R.mipmap.ic_launcher);
+        progressDialog.setMessage("Creating meet...");
+        progressDialog.show();
         setContentView(R.layout.meeting_layout);
         fab = findViewById(R.id.fab);
         mRecyclerView = findViewById(R.id.history_recycler_view);
@@ -79,13 +85,8 @@ public class MeetingActivity  extends AppCompatActivity
             creator = false;
             //Coger idmeeting de la actividad de join
             meetId = intent.getStringExtra("idMeeting");
-            viewModel.initalizeMqttClient(meetId);
+            viewModel.initalizeMqttClient(idMeeting);
             Log.d("PAHOJOIN","Se ha añadido el cliente");
-            if (!viewModel.getMeetingPointLocation().hasObservers()) {
-                Log.d("PAHOJOIN","ENTRA Aquí");
-                viewModel.getMeetingPointLocation()
-                        .observe(this, latLng -> onMeetingPointLocationReceived(latLng));
-            }
         }
         Log.d("PAHOJOIN","LLega Aquí");
         viewModel.getParticipants()
@@ -162,6 +163,7 @@ public class MeetingActivity  extends AppCompatActivity
         Log.d("PAHOJOIN","Meeting location recieved");
         Toast.makeText(this,"Meeting location recieved",Toast.LENGTH_SHORT);
         mapFragment.setMarker(location);
+        viewModel.getCurrentLocation().removeObservers(this);
     }
 
     private boolean isPermissionGranted(String[] grantPermissions, int[] grantResults,
@@ -176,14 +178,19 @@ public class MeetingActivity  extends AppCompatActivity
 
     private void onPahoClientConnectionStatusChanged(PahoClient.ConnectionStatus status) {
         if (status.equals(PahoClient.ConnectionStatus.SUCCEEDED)) {
-            lat = intent.getDoubleExtra("placeLatitude", 0);
-            longit = intent.getDoubleExtra("placeLongitude", 0);
-            viewModel.publishMeetingPointLocation(lat, longit);
-            // Dismiss splash screen
+            if (creator) {
+                lat = intent.getDoubleExtra("placeLatitude", 0);
+                longit = intent.getDoubleExtra("placeLongitude", 0);
+                viewModel.publishMeetingPointLocation(lat, longit);
+            } else if (!viewModel.getMeetingPointLocation().hasObservers()) {
+                Log.d("PAHOJOIN", "ENTRA Aquí");
+                viewModel.getMeetingPointLocation()
+                        .observe(this, latLng -> onMeetingPointLocationReceived(latLng));
+            }
+            progressDialog.dismiss();
         } else {
-            // Mensaje de error
+            Toast.makeText(this, "An error ocurred", Toast.LENGTH_LONG).show();
         }
 
     }
-
 }

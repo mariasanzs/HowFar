@@ -71,7 +71,7 @@ public class PahoClient {
 
             }
         });
-
+        Log.d("PAHO", isConnected() ? "YES" : "NO");
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         byte[] payload = lastWillMessage.getBytes();
@@ -137,6 +137,7 @@ public class PahoClient {
         message.setQos(1);
         try {
             mqttAndroidClient.publish(topic,message);
+            Log.d("PAHOHO", topic);
             Log.d("PAHOJOIN","mensaje enviado");
         } catch (Exception e) {
             e.printStackTrace();

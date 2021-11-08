@@ -71,9 +71,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
     }
     private void initCreateMeetActivity(String string_result){
         if (listofcinemasinitialized == false) {
-            Log.d(LOGSLOADWEBCONTENT, "message received from background thread");
             try {
-                Log.d(LOGSLOADWEBCONTENT, string_result);
                 JSONObject obj = new JSONObject(string_result);
                 // fetch JSONObject named employee
                 JSONArray graph = obj.getJSONArray("@graph");
@@ -84,7 +82,6 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                     JSONObject location = cinema.getJSONObject("location");
                     double latitude = location.getDouble("latitude");
                     double longitude = location.getDouble("longitude");
-                    Log.d(LOGSLOADWEBCONTENT, String.valueOf(longitude));
                     places.add(new Place(title,longitude,latitude));
                 }
 
