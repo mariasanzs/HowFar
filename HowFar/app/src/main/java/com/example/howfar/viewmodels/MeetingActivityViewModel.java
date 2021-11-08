@@ -79,7 +79,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         if (ContextCompat.checkSelfPermission(application.getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 10, this);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
         }
     }
 
@@ -97,7 +97,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         meetingPointLocation = getMeetingPointLocation();
         meetingPointLocation.postValue(meetpoint);
         String messagecontent = lat.toString() + ":" + longit.toString();
-        pahoClient.publishMessage(topics.get(0), messagecontent);
+        pahoClient.publishMessage(topics.get(0), messagecontent, true);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
             // Publicar distancia
             String nickname = pahoClient.getUserNickname();
             String messageContent = nickname + ":" + distance.toString();
-            pahoClient.publishMessage(topics.get(1),messageContent);
+            pahoClient.publishMessage(topics.get(1), messageContent, false);
         }
     }
 

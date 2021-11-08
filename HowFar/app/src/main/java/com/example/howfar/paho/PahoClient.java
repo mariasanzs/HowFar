@@ -125,15 +125,11 @@ public class PahoClient {
         }
     }
 
-    private void log(String mainText) {
-        System.out.println("LOG: " + mainText);
-    }
-
-    public void publishMessage(String topic, String publishMessage) {
+    public void publishMessage(String topic, String publishMessage, boolean retain) {
         MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());
         Log.d("PAHOJOIN","config mensaje");
-        message.setRetained(true);
+        message.setRetained(retain);
         message.setQos(1);
         try {
             mqttAndroidClient.publish(topic,message);
