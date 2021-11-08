@@ -23,6 +23,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.util.ArrayList;
 
 public class PahoClient {
+    public enum ConnectionStatus { SUCCEEDED, FAILURE };
+    private PahoClientListener listener;
     final String serverUri = "tcp://broker.hivemq.com:1883";
     private final String preferencesFile;
     String lastWillMessage = "Goodbye!";
@@ -33,7 +35,8 @@ public class PahoClient {
     private MutableLiveData<MqttContent> lastReceivedMessage;
     private final String NICKNAMEKEY = "userName";
     ArrayList<String> clientTopics;
-    public PahoClient(Application application, ArrayList<String> topics) {
+    public PahoClient(Application application, ArrayList<String> topics, PahoClientListener listener) {
+        this.listener = listener;
         preferencesFile = application.getString(R.string.shared_preferences_file);
         preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
         userNickname = preferences.getString(NICKNAMEKEY, "");
@@ -88,7 +91,7 @@ public class PahoClient {
                     for (String topic : clientTopics) {
                         subscribeToTopic(topic);
                     }
-
+                    listener.onConnectionCompleted();
                 }
 
                 @Override
@@ -96,6 +99,7 @@ public class PahoClient {
                     Log.d("PAHOJOIN", "Failed to connect to: " + serverUri +
                             ". Cause: " + ((exception.getCause() == null)?
                             exception.toString() : exception.getCause()));
+                    listener.onConnectionFailed();
                 }
             });
         } catch (MqttException e) {
@@ -138,10 +142,6 @@ public class PahoClient {
             e.printStackTrace();
             Log.d("PAHOJOIN",e.toString());
         }
-
-
-
-
     }
 
     public MutableLiveData<MqttContent> getLastReceivedMessage() {
@@ -150,7 +150,12 @@ public class PahoClient {
         }
         return lastReceivedMessage;
     }
+
     public String getUserNickname(){
         return userNickname;
+    }
+
+    public boolean isConnected() {
+        return mqttAndroidClient.isConnected();
     }
 }

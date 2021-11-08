@@ -25,6 +25,7 @@ import com.example.howfar.R;
 import com.example.howfar.adapter.HistoryAdapter;
 import com.example.howfar.fragments.MapsFragment;
 import com.example.howfar.model.Participant;
+import com.example.howfar.paho.PahoClient;
 import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -73,19 +74,7 @@ public class MeetingActivity  extends AppCompatActivity
             creator = true;
             meetId = UUID.randomUUID().toString();
             viewModel.initalizeMqttClient(idMeeting);
-            Double lat = intent.getDoubleExtra("placeLatitude", 0);
-            Double longit = intent.getDoubleExtra("placeLongitude", 0);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //Write whatever to want to do after delay specified (1 sec)
-                    viewModel.publishMeetingPointLocation(lat, longit);
-                    Log.d("Handler", "Running Handler");
-                }
-            }, 10000);
             Log.d("PAHOJOIN", "Localización publicada ");
-
-
         } else {
             creator = false;
             //Coger idmeeting de la actividad de join
@@ -94,16 +83,18 @@ public class MeetingActivity  extends AppCompatActivity
             Log.d("PAHOJOIN","Se ha añadido el cliente");
             if (!viewModel.getMeetingPointLocation().hasObservers()) {
                 Log.d("PAHOJOIN","ENTRA Aquí");
-                viewModel.getMeetingPointLocation().observe(this, latLng -> onMeetingPointLocationReceived(latLng));
-
+                viewModel.getMeetingPointLocation()
+                        .observe(this, latLng -> onMeetingPointLocationReceived(latLng));
             }
         }
         Log.d("PAHOJOIN","LLega Aquí");
-        viewModel.getParticipants().observe(this, participant -> onParticipantDistanceChanged(participant));
-        viewModel.getCurrentLocation().observe(this, location -> onLocationChanged(location));
+        viewModel.getParticipants()
+                .observe(this, participant -> onParticipantDistanceChanged(participant));
+        viewModel.getCurrentLocation()
+                .observe(this, location -> onLocationChanged(location));
+        viewModel.getPahoClientConnectionStatus()
+                .observe(this, status -> onPahoClientConnectionStatusChanged(status));
         fab.setOnClickListener(view -> sharingId());
-
-
     }
 
     private void sharingId() {
@@ -181,6 +172,18 @@ public class MeetingActivity  extends AppCompatActivity
             }
         }
         return false;
+    }
+
+    private void onPahoClientConnectionStatusChanged(PahoClient.ConnectionStatus status) {
+        if (status.equals(PahoClient.ConnectionStatus.SUCCEEDED)) {
+            lat = intent.getDoubleExtra("placeLatitude", 0);
+            longit = intent.getDoubleExtra("placeLongitude", 0);
+            viewModel.publishMeetingPointLocation(lat, longit);
+            // Dismiss splash screen
+        } else {
+            // Mensaje de error
+        }
+
     }
 
 }

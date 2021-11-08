@@ -18,14 +18,20 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.howfar.model.MqttContent;
 import com.example.howfar.model.Participant;
 import com.example.howfar.paho.PahoClient;
+import com.example.howfar.paho.PahoClientListener;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 
-public class MeetingActivityViewModel extends AndroidViewModel implements LocationListener {
+public class MeetingActivityViewModel extends AndroidViewModel implements
+        LocationListener,
+        PahoClientListener
+{
     private MutableLiveData<Participant> participants;
     private MutableLiveData<Location> currentLocation;
     private MutableLiveData<LatLng> meetingPointLocation;
+    private MutableLiveData<PahoClient.ConnectionStatus> pahoClientConnectionStatus;
     private ArrayList<String> topics = new ArrayList<>();
     private Application application;
     private PahoClient pahoClient;
@@ -53,6 +59,13 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
         return currentLocation;
     }
 
+    public MutableLiveData<PahoClient.ConnectionStatus> getPahoClientConnectionStatus() {
+        if (pahoClientConnectionStatus == null) {
+            pahoClientConnectionStatus = new MutableLiveData<>();
+        }
+        return pahoClientConnectionStatus;
+    }
+
     public MutableLiveData<LatLng> getMeetingPointLocation() {
         if (meetingPointLocation == null) {
             meetingPointLocation = new MutableLiveData<>();
@@ -73,7 +86,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     public void initalizeMqttClient(String meetingId) {
         topics.add(meetingId + "/location");
         topics.add(meetingId + "/distance");
-        pahoClient = new PahoClient(application, topics);
+        pahoClient = new PahoClient(application, topics, this);
         if (!pahoClient.getLastReceivedMessage().hasObservers()) {
             pahoClient.getLastReceivedMessage().observeForever(msg -> onMessageArrived(msg));
         }
@@ -89,32 +102,30 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        currentLocation = getCurrentLocation();
-        currentLocation.postValue(location);
+        getCurrentLocation().postValue(location);
         // Calcular distancia al sitio
-        Location meetingpoint = new Location("");
-        LatLng latlongmeeting = meetingPointLocation.getValue();
-        meetingpoint.setLatitude(latlongmeeting.latitude);
-        meetingpoint.setLongitude(latlongmeeting.longitude);
-        float fdistance = location.distanceTo(meetingpoint);
-        Integer distance = new Integer((int) fdistance);
-        // Publicar distancia
-        String nickname = pahoClient.getUserNickname();
-        String messagecontent = nickname+":"+distance.toString();
-        pahoClient.publishMessage(topics.get(1),messagecontent);
-
+        Location meetingPoint = new Location("");
+        LatLng latLongMeeting = getMeetingPointLocation().getValue();
+        if (latLongMeeting != null && pahoClient.isConnected()) {
+            meetingPoint.setLatitude(latLongMeeting.latitude);
+            meetingPoint.setLongitude(latLongMeeting.longitude);
+            float fdistance = location.distanceTo(meetingPoint);
+            Integer distance = new Integer((int) fdistance);
+            // Publicar distancia
+            String nickname = pahoClient.getUserNickname();
+            String messageContent = nickname + ":" + distance.toString();
+            pahoClient.publishMessage(topics.get(1),messageContent);
+        }
     }
 
     private void onMessageArrived(MqttContent message) {
-        participants = getParticipants();
-        meetingPointLocation = getMeetingPointLocation();
         if (message.topic.contains("distance")) {
             String[] pieces = message.payload.split(":");
             if (pieces.length >= 2) {
                 String nickname = pieces[0];
                 Integer distance = Integer.parseInt(pieces[1]);
                 Participant participant = new Participant(nickname, distance);
-                participants.postValue(participant);
+                getParticipants().postValue(participant);
             }
         } else if (message.topic.contains("location")) {
             String[] pieces = message.payload.split(":");
@@ -122,9 +133,19 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
                 Double latitude = Double.valueOf(pieces[0]);
                 Double longitude = Double.valueOf(pieces[1]);
                 LatLng latLng = new LatLng(latitude, longitude);
-                meetingPointLocation.postValue(latLng);
+                getMeetingPointLocation().postValue(latLng);
                 Log.d("PAHOJOIN","Se recibe mensaje de meeting point location");
             }
         }
+    }
+
+    @Override
+    public void onConnectionCompleted() {
+        getPahoClientConnectionStatus().postValue(PahoClient.ConnectionStatus.SUCCEEDED);
+    }
+
+    @Override
+    public void onConnectionFailed() {
+        getPahoClientConnectionStatus().postValue(PahoClient.ConnectionStatus.FAILURE);
     }
 }
