@@ -98,7 +98,7 @@ public class MeetingActivity  extends AppCompatActivity
     private void sharingId() {
         //FUNCIONA
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Click to share meetingID", idMeeting);
+        ClipData clip = ClipData.newPlainText("Click to share meetingID", meetId);
         clipboard.setPrimaryClip(clip);
         Toast.makeText(MeetingActivity.this, "Meeting ID copied to clipboard!",
                 Toast.LENGTH_SHORT).show();
