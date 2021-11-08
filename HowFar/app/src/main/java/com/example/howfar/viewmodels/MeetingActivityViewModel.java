@@ -96,8 +96,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         LatLng meetpoint = new LatLng(lat,longit);
         meetingPointLocation = getMeetingPointLocation();
         meetingPointLocation.postValue(meetpoint);
-        String messagecontent = lat.toString()+":"+longit.toString();
-        pahoClient.publishMessage(topics.get(0),messagecontent);
+        String messagecontent = lat.toString() + ":" + longit.toString();
+        pahoClient.publishMessage(topics.get(0), messagecontent);
     }
 
     @Override

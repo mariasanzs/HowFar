@@ -137,11 +137,8 @@ public class PahoClient {
         message.setQos(1);
         try {
             mqttAndroidClient.publish(topic,message);
-            Log.d("PAHOHO", topic);
-            Log.d("PAHOJOIN","mensaje enviado");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("PAHOJOIN",e.toString());
         }
     }
 
