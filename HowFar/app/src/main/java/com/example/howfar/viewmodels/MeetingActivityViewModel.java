@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -55,6 +56,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     public MutableLiveData<LatLng> getMeetingPointLocation() {
         if (meetingPointLocation == null) {
             meetingPointLocation = new MutableLiveData<>();
+            Log.d("PAHOJOIN","El meeting point location estaba a null");
+
         }
         return meetingPointLocation;
     }
@@ -68,8 +71,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
     }
 
     public void initalizeMqttClient(String meetingId) {
-        topics.add(meetingId.toString() + "/location");
-        topics.add(meetingId.toString() + "/distance");
+        topics.add(meetingId + "/location");
+        topics.add(meetingId + "/distance");
         pahoClient = new PahoClient(application, topics);
         if (!pahoClient.getLastReceivedMessage().hasObservers()) {
             pahoClient.getLastReceivedMessage().observeForever(msg -> onMessageArrived(msg));
@@ -80,7 +83,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
         LatLng meetpoint = new LatLng(lat,longit);
         meetingPointLocation = getMeetingPointLocation();
         meetingPointLocation.postValue(meetpoint);
-        pahoClient.publishMessage(topics.get(0),lat+":"+longit);
+        String messagecontent = lat.toString()+":"+longit.toString();
+        pahoClient.publishMessage(topics.get(0),messagecontent);
     }
 
     @Override
@@ -119,6 +123,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements Locati
                 Double longitude = Double.valueOf(pieces[1]);
                 LatLng latLng = new LatLng(latitude, longitude);
                 meetingPointLocation.postValue(latLng);
+                Log.d("PAHOJOIN","Se recibe mensaje de meeting point location");
             }
         }
     }

@@ -88,11 +88,12 @@ public class PahoClient {
                     for (String topic : clientTopics) {
                         subscribeToTopic(topic);
                     }
+
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("PAHO", "Failed to connect to: " + serverUri +
+                    Log.d("PAHOJOIN", "Failed to connect to: " + serverUri +
                             ". Cause: " + ((exception.getCause() == null)?
                             exception.toString() : exception.getCause()));
                 }
@@ -104,15 +105,15 @@ public class PahoClient {
 
     private void subscribeToTopic(String topic) {
         try {
-            mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(topic, 1, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    log("Subscribed to " + topic);
+                    Log.d("PAHOJOIN","Subscribed to " + topic);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    log("Failed to subsribe");
+                    Log.d("PAHOJOIN","Failed to subsribe");
                 }
             });
         } catch (MqttException e) {
@@ -127,12 +128,15 @@ public class PahoClient {
     public void publishMessage(String topic, String publishMessage) {
         MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());
+        Log.d("PAHOJOIN","config mensaje");
         message.setRetained(true);
-        message.setQos(2);
+        message.setQos(1);
         try {
             mqttAndroidClient.publish(topic,message);
+            Log.d("PAHOJOIN","mensaje enviado");
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("PAHOJOIN",e.toString());
         }
 
 

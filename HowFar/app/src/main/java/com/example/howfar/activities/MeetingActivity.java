@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,7 +52,6 @@ public class MeetingActivity  extends AppCompatActivity
     FloatingActionButton fab;
 
     Intent intent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,15 +73,17 @@ public class MeetingActivity  extends AppCompatActivity
             creator = true;
             meetId = UUID.randomUUID().toString();
             viewModel.initalizeMqttClient(idMeeting);
-            Double lat = intent.getDoubleExtra("placeLatitude",0);
-            Double longit = intent.getDoubleExtra("placeLongitude",0);
+            Double lat = intent.getDoubleExtra("placeLatitude", 0);
+            Double longit = intent.getDoubleExtra("placeLongitude", 0);
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     //Write whatever to want to do after delay specified (1 sec)
-                    viewModel.publishMeetingPointLocation(lat,longit);
+                    viewModel.publishMeetingPointLocation(lat, longit);
+                    Log.d("Handler", "Running Handler");
                 }
-            }, 1000);
+            }, 10000);
+            Log.d("PAHOJOIN", "Localización publicada ");
 
 
         } else {
@@ -89,14 +91,18 @@ public class MeetingActivity  extends AppCompatActivity
             //Coger idmeeting de la actividad de join
             meetId = intent.getStringExtra("idMeeting");
             viewModel.initalizeMqttClient(meetId);
+            Log.d("PAHOJOIN","Se ha añadido el cliente");
             if (!viewModel.getMeetingPointLocation().hasObservers()) {
+                Log.d("PAHOJOIN","ENTRA Aquí");
                 viewModel.getMeetingPointLocation().observe(this, latLng -> onMeetingPointLocationReceived(latLng));
+
             }
         }
-
+        Log.d("PAHOJOIN","LLega Aquí");
         viewModel.getParticipants().observe(this, participant -> onParticipantDistanceChanged(participant));
         viewModel.getCurrentLocation().observe(this, location -> onLocationChanged(location));
         fab.setOnClickListener(view -> sharingId());
+
 
     }
 
@@ -162,6 +168,7 @@ public class MeetingActivity  extends AppCompatActivity
 
     private void onMeetingPointLocationReceived(LatLng location) {
         // Meter un toast
+        Log.d("PAHOJOIN","Meeting location recieved");
         Toast.makeText(this,"Meeting location recieved",Toast.LENGTH_SHORT);
         mapFragment.setMarker(location);
     }
