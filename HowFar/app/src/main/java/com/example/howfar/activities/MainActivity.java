@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     private void goJoinFormButtonPressed() {
         Intent i = new Intent(this, MeetingActivity.class);
-        i.putExtra("idMeeting",joinIdMeeting);
+        i.putExtra("idMeeting", joinIdMeeting);
         startActivity(i);
     }
 
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private void createMeetButtonPressed() {
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
-            intent.putExtra("nickname",nickname);
+            intent.putExtra("nickname", nickname);
             startActivity(intent);
 
         }
