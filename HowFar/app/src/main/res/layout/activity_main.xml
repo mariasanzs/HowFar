@@ -23,7 +23,7 @@
     <EditText
         android:id="@+id/nameField"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Enter your nickname"
@@ -58,6 +58,19 @@
             android:text="Create Meet" />
 
     </LinearLayout>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/bProx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:text="Prox"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <View
         android:id="@+id/tintView"
@@ -97,7 +110,7 @@
         <EditText
             android:id="@+id/editTextTextPersonName2"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
