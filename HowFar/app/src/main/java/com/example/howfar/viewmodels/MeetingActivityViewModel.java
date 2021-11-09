@@ -102,8 +102,10 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        getCurrentLocation().postValue(location);
-        // Calcular distancia al sitio
+        publishCurrentDistanceToMeetingPointFrom(location);
+    }
+
+    private void publishCurrentDistanceToMeetingPointFrom(Location location) {
         Location meetingPoint = new Location("");
         LatLng latLongMeeting = getMeetingPointLocation().getValue();
         if (latLongMeeting != null && pahoClient.isConnected()) {
@@ -113,8 +115,20 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
             Integer distance = new Integer((int) fDistance);
             String nickname = pahoClient.getUserNickname();
             String messageContent = nickname + ":" + distance.toString();
-            pahoClient.publishMessage(topics.get(1), messageContent, false);
+            pahoClient.publishMessage(topics.get(1), messageContent, true);
         }
+    }
+
+    private Location getLastKnownLocation() {
+        if (ContextCompat.checkSelfPermission(application.getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+        }
+        return null;
     }
 
     private void onMessageArrived(MqttContent message) {
@@ -133,6 +147,10 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
                 Double longitude = Double.valueOf(pieces[1]);
                 LatLng latLng = new LatLng(latitude, longitude);
                 getMeetingPointLocation().postValue(latLng);
+                Location lastLocation = getLastKnownLocation();
+                if (getLastKnownLocation() != null) {
+                    publishCurrentDistanceToMeetingPointFrom(lastLocation);
+                }
             }
         }
     }

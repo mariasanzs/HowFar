@@ -71,7 +71,6 @@ public class PahoClient {
 
             }
         });
-        Log.d("PAHO", isConnected() ? "YES" : "NO");
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         byte[] payload = lastWillMessage.getBytes();
@@ -128,7 +127,6 @@ public class PahoClient {
     public void publishMessage(String topic, String publishMessage, boolean retain) {
         MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());
-        Log.d("PAHOJOIN","config mensaje");
         message.setRetained(retain);
         message.setQos(1);
         try {
