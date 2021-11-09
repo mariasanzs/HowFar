@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener, SensorEventListener {
+public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener{
     private Button createMeetButton;
     private Button joinMeetButton;
     private Button goJoinFormButton;
@@ -48,19 +48,13 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private List<Place> places = new ArrayList<>();
     private boolean listofcinemasinitialized = false;
     private SwitchCompat bProx;
-    private SensorManager sensorManager;
-    private Sensor ProxSensor;
     private TextToSpeech mTTS;
-    private boolean proxSensorActive;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Proximity Sensor to activate Text To Speech
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        ProxSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        //Configuration of Text To Speech (volume and speed)
         mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -79,55 +73,32 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             }
         });
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        if (!viewModel.getSensorStatus().hasObservers()) {
+            viewModel.getSensorStatus().observe(this, bool -> onProximitySensorChanged(bool));
+        }
         initializeViews();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        viewModel.getSensorStatus().observe(this, bool -> publishSensorStatus(bool));
-        viewModel.switchChanged(proxSensorActive);
         viewModel.activityStopped();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
-        viewModel.getSensorStatus().observe(this, bool -> publishSensorStatus(bool));
-        bProx.setChecked(proxSensorActive);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //sensorManager.registerListener(this, ProxSensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //sensorManager.unregisterListener(this, ProxSensor);
-    }
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent){
-        Toast.makeText(this, "status: main", Toast.LENGTH_SHORT).show();
-        viewModel.onSensorChanged(sensorEvent);
-        viewModel.getSensorStatus().observe(this, bool -> publishSensorStatus(bool));
-        bProx.setChecked(proxSensorActive);
-        mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
-        //proxSensorActive = viewModel.getSensorStatus();
-        if(proxSensorActive){
-            Toast.makeText(getApplicationContext(), "near", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(getApplicationContext(), "far", Toast.LENGTH_SHORT).show();
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 
-    public void publishSensorStatus(Boolean bool){
-        Toast.makeText(this, "status:" + bool, Toast.LENGTH_SHORT).show();
-        proxSensorActive =  bool;
-    }
+    public void onProximitySensorChanged(Boolean bool) {
+        if (bool) {
+            bProx.setChecked(true);
+            mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
     private void initializeViews() {
@@ -136,8 +107,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b){
                 viewModel.switchChanged(b);
+                if (b) {
+                    mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+                }
             }
         });
+        bProx.setChecked(viewModel.appShouldTalk);
         tintView = findViewById(R.id.tintView);
         tintView.setVisibility(View.GONE);
         tintView.setAlpha(0.0f);
@@ -181,13 +156,13 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(true);
         createMeetButton.setEnabled(true);
         joinMeetButton.setEnabled(true);
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak("Cancelling going to the meeting", TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 
     private void goJoinFormButtonPressed() {
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak("Going to the Meeting", TextToSpeech.QUEUE_FLUSH, null);
         }
     }
@@ -197,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             return true;
         }
         nameField.setError("Nickname must contain at least 4 non special characters");
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak("Invalid Nickname", TextToSpeech.QUEUE_FLUSH, null);
         }
         return false;
@@ -212,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak("Creating Meeting", TextToSpeech.QUEUE_FLUSH, null);
         }
         if (validateNameField()){
@@ -222,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void joinMeetButtonPressed() {
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak("Join Meeting", TextToSpeech.QUEUE_FLUSH, null);
         }
         if (validateNameField()) {
             showJoinForm();
-            if (proxSensorActive) {
+            if (viewModel.appShouldTalk) {
                 mTTS.speak("Enter ID Meeting", TextToSpeech.QUEUE_ADD, null);
             }
         }
@@ -243,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         String name = nameField.getText().toString();
         setHelloText(name);
         viewModel.nicknameChanged(name);
-        if (proxSensorActive) {
+        if (viewModel.appShouldTalk) {
             mTTS.speak(nameField.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
         }
     }

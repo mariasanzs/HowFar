@@ -27,11 +27,11 @@ public class MainActivityViewModel extends AndroidViewModel implements SensorEve
     private String preferencesFile;
     private final String NICKNAMEKEY = "userName";
     private Application application;
-    //private SwitchCompat bProx;
     private SensorManager sensorManager;
     private Sensor ProxSensor;
-    //private boolean ProxSensorIsNear = false;
-    private MutableLiveData<Boolean> ProxSensorIsNear;
+    public boolean appShouldTalk;
+    private String APPSHOULDTALKKEY = "appShouldTalk";
+    private MutableLiveData<Boolean> proxSensorIsNear;
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -42,18 +42,8 @@ public class MainActivityViewModel extends AndroidViewModel implements SensorEve
         preferencesFile = application.getString(R.string.shared_preferences_file);
         preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
         userNickname = preferences.getString(NICKNAMEKEY, "");
-        preferences.getString(NICKNAMEKEY, "");
-        preferences.getBoolean("ProxSensorIsNear", false);
-        //bProx.setChecked(ProxSensorIsNear);
-        if(getSensorStatus().getValue()){
-            //If the sensor was on, it is still working
-            //bProx.setVisibility(View.VISIBLE);
-            sensorManager.registerListener(this, ProxSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }else{
-            sensorManager.unregisterListener(this, ProxSensor);
-            //bProx.setVisibility(View.GONE);
-        }
-
+        appShouldTalk = preferences.getBoolean(APPSHOULDTALKKEY, false);
+        sensorManager.registerListener(this, ProxSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void nicknameChanged(String newNickname) {
@@ -64,51 +54,38 @@ public class MainActivityViewModel extends AndroidViewModel implements SensorEve
     }
 
     public void switchChanged(boolean b) {
+        appShouldTalk = b;
         if (!b) {
-            // unregister listener and make the appropriate changes in the UI:
-            ProxSensorIsNear.setValue(Boolean.valueOf(b));;
-            sensorManager.unregisterListener(MainActivityViewModel.this, ProxSensor);
-        } else {
-            // register listener and make the appropriate changes in the UI:
-            sensorManager.registerListener(MainActivityViewModel.this, ProxSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            ProxSensorIsNear.setValue(Boolean.valueOf(b));;
+            // If button is disabled, we register sensor so that whenever we put our hand near,
+            // the button gets enabled again
+            sensorManager.registerListener(this, ProxSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
     public void onSensorChanged(SensorEvent sensorEvent){
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             if (sensorEvent.values[0] == 0) { //near
-                ProxSensorIsNear.setValue(Boolean.valueOf(true));
-                //bProx.setVisibility(View.VISIBLE);
-                //bProx.setChecked(ProxSensorIsNear);
+                proxSensorIsNear.postValue(Boolean.valueOf(true));
+                appShouldTalk = true;
+                sensorManager.unregisterListener(this);
             }
         }
     }
-
-
-    //public boolean getSensorStatus(){ return this.ProxSensorIsNear; }
-
-    public MutableLiveData<Boolean> getSensorStatus() {
-        if (ProxSensorIsNear == null) {
-            ProxSensorIsNear = new MutableLiveData<>(false);
-        }
-        return ProxSensorIsNear;
+    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
-    public void publishSensorStatus(Boolean bool){
-        ProxSensorIsNear = getSensorStatus();
-        ProxSensorIsNear.postValue(bool);
+    public MutableLiveData<Boolean> getSensorStatus() {
+        if (proxSensorIsNear == null) {
+            proxSensorIsNear = new MutableLiveData<>(false);
+        }
+        return proxSensorIsNear;
     }
 
     public void activityStopped() {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(NICKNAMEKEY, userNickname);
-        //ProxSensorIsNear = bProx.isChecked();
-        editor.putBoolean("ProxSensorIsNear", ProxSensorIsNear.getValue());
+        editor.putBoolean(APPSHOULDTALKKEY, appShouldTalk);
         editor.apply();
     }
 
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
 }
