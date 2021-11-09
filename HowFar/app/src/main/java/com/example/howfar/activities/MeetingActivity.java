@@ -186,4 +186,5 @@ public class MeetingActivity  extends AppCompatActivity
             Toast.makeText(this, "An error ocurred", Toast.LENGTH_LONG).show();
         }
     }
+
 }

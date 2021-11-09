@@ -152,4 +152,14 @@ public class PahoClient {
     public boolean isConnected() {
         return mqttAndroidClient.isConnected();
     }
+
+    public void disconnect() {
+        try {
+            mqttAndroidClient.disconnect();
+            lastReceivedMessage = null;
+            listener = null;
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
 }

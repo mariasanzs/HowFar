@@ -142,4 +142,13 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     public void onConnectionFailed() {
         getPahoClientConnectionStatus().postValue(PahoClient.ConnectionStatus.FAILURE);
     }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.d("Oncleared","oncleared executed");
+        locationManager.removeUpdates(this);
+        pahoClient.disconnect();
+
+    }
 }
