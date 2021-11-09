@@ -6,16 +6,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
 import com.example.howfar.adapter.RecyclerViewAdapter;
 import com.example.howfar.background.LoadWebContent;
+import com.example.howfar.viewmodels.MainActivityViewModel;
 import com.example.howfar.model.Place;
 
 import org.json.JSONArray;
@@ -24,8 +33,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+
 
 public class CreateMeetActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
 
@@ -34,17 +46,37 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
     Executor es;
     Handler handler;
     private List<Place> places = new ArrayList<>();
+    private MainActivityViewModel viewModel;
     private boolean listofcinemasinitialized = false;
     public static final String LOGSLOADWEBCONTENT = "LOGSLOADWEBCONTENT";
     // To load content from the website
     private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
+    private TextToSpeech mTTS;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_of_places);
+        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if(i == TextToSpeech.SUCCESS){
+                    int result = mTTS.setLanguage(Locale.ENGLISH);
+                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                        Log.e("TTS", "Language not suported");
+                    }else{
+                        //if everything is succesful
+                        mTTS.setPitch(0.5f);
+                        mTTS.setSpeechRate(0.5f);
+                    }
+                }else{
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setIcon(R.mipmap.ic_launcher);
         progressDialog.setMessage("Loading...");
@@ -59,6 +91,9 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                     initCreateMeetActivity(string_result);
                     initRecyclerView();
                     progressDialog.dismiss();
+                    if (viewModel.appShouldTalk) {
+                        mTTS.speak("Choose a meeting point", TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }else{
                     Toast.makeText(CreateMeetActivity.this,
                             "It was not possible to get content from the web",
@@ -70,11 +105,9 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
         es.execute(loadURLContentsjson);
         progressDialog.show();
-
         //Obtiene referencia en Layout de WebView.
-
-
     }
+
     private void initCreateMeetActivity(String string_result){
         if (listofcinemasinitialized == false) {
             try {
@@ -110,10 +143,12 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-
     @Override
     public void onItemClick(int position) {
         Place place = places.get(position);
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("You have selected" + place.getTitle(), TextToSpeech.QUEUE_FLUSH, null);
+        }
         Intent intent = new Intent(this, ConfirmMeetActivity.class);
         intent.putExtra("placeName", place.getTitle());
         intent.putExtra("placeLatitude", place.getLatitude());
@@ -121,6 +156,11 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         startActivity(intent);
     }
 }
+
+
+
+
+
 
 
 
