@@ -157,7 +157,6 @@ public class MeetingActivity  extends AppCompatActivity
         Log.d("PAHOJOIN","Meeting location recieved");
         Toast.makeText(this,"Meeting location recieved",Toast.LENGTH_SHORT);
         mapFragment.setMarker(location);
-        viewModel.getCurrentLocation().removeObservers(this);
     }
 
     private boolean isPermissionGranted(String[] grantPermissions, int[] grantResults,
