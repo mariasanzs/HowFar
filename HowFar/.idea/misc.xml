@@ -11,6 +11,7 @@
         <entry key="../../howFar/HowFar/app/src/main/res/layout/list_of_places.xml" value="0.3115942028985507" />
         <entry key="../../howFar/HowFar/app/src/main/res/layout/place_layout.xml" value="0.3115942028985507" />
         <entry key="../../howFar/HowFar/app/src/main/res/layout/round_button.xml" value="0.19375" />
+<<<<<<< HEAD
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/drawable/app_icon_background.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/drawable/background_splash.xml" value="0.2203125" />
@@ -18,11 +19,21 @@
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/layout/place_layout.xml" value="0.17527173913043478" />
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/mipmap-anydpi-v26/app_icon.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/mipmap-anydpi-v26/app_icon_round.xml" value="0.18333333333333332" />
+=======
+        <entry key="..\:/Users/Maria/Documents/Master UPM IoT/1 Bimestre/MDP Android/FinalProject/HowFar/HowFar/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
+>>>>>>> main
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/activity_confirm.xml" value="0.14266304347826086" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/activity_main.xml" value="0.1408514492753623" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/fragmentmaps.xml" value="0.14266304347826086" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/list_of_places.xml" value="0.1408514492753623" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/place_layout.xml" value="0.14175724637681159" />
+        <entry key="app/src/main/res/drawable/ic_mic.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/layout/activity_confirm.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_maps.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/history.xml" value="0.190625" />
+        <entry key="app/src/main/res/layout/list_of_places.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/place_layout.xml" value="0.190625" />
       </map>
     </option>
   </component>
