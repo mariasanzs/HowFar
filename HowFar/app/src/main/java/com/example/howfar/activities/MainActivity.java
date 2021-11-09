@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
-        joinIdMeeting = joinIdField.getText().toString();
+
 
     }
 
@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void goJoinFormButtonPressed() {
+        joinIdMeeting = joinIdField.getText().toString();
         Intent i = new Intent(this, MeetingActivity.class);
         i.putExtra("idMeeting", joinIdMeeting);
         startActivity(i);

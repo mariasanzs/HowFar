@@ -28,6 +28,7 @@
         android:ems="10"
         android:hint="Enter your nickname"
         android:inputType="textPersonName"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="@+id/helloTextView"
         app:layout_constraintStart_toStartOf="@+id/helloTextView"
         app:layout_constraintTop_toBottomOf="@+id/helloTextView" />
@@ -121,7 +122,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2" />
+            app:layout_constraintTop_toBottomOf="@+id/joinIdField" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
