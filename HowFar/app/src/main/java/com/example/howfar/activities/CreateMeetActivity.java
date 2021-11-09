@@ -59,7 +59,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                     initCreateMeetActivity(string_result);
                     initRecyclerView();
                     progressDialog.dismiss();
-                }else{
+                } else {
                     Toast.makeText(CreateMeetActivity.this,
                             "It was not possible to get content from the web",
                             Toast.LENGTH_LONG).show();
@@ -67,14 +67,11 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                 }
             }
         };
-        LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
+        LoadWebContent loadURLContentsjson = new LoadWebContent(handler, CONTENT_TYPE_JSON, URL_CINEMAS);
         es.execute(loadURLContentsjson);
         progressDialog.show();
-
-        //Obtiene referencia en Layout de WebView.
-
-
     }
+
     private void initCreateMeetActivity(String string_result){
         if (listofcinemasinitialized == false) {
             try {
@@ -110,7 +107,6 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-
     @Override
     public void onItemClick(int position) {
         Place place = places.get(position);
@@ -118,6 +114,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         intent.putExtra("placeName", place.getTitle());
         intent.putExtra("placeLatitude", place.getLatitude());
         intent.putExtra("placeLongitude", place.getLongitude());
+        intent.putExtra("nickname", getIntent().getStringExtra("nickname"));
         startActivity(intent);
     }
 }

@@ -35,7 +35,11 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     private Application application;
     private PahoClient pahoClient;
     private LocationManager locationManager;
+    private String nickname;
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
     public MeetingActivityViewModel(@NonNull Application application) {
         super(application);
@@ -74,6 +78,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     public void beginRequestingLocation() {
         if (ContextCompat.checkSelfPermission(application.getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
         }
     }
@@ -104,9 +109,8 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         if (latLongMeeting != null && pahoClient.isConnected()) {
             meetingPoint.setLatitude(latLongMeeting.latitude);
             meetingPoint.setLongitude(latLongMeeting.longitude);
-            float fdistance = location.distanceTo(meetingPoint);
-            Integer distance = new Integer((int) fdistance);
-            // Publicar distancia
+            float fDistance = location.distanceTo(meetingPoint);
+            Integer distance = new Integer((int) fDistance);
             String nickname = pahoClient.getUserNickname();
             String messageContent = nickname + ":" + distance.toString();
             pahoClient.publishMessage(topics.get(1), messageContent, false);
@@ -129,7 +133,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
                 Double longitude = Double.valueOf(pieces[1]);
                 LatLng latLng = new LatLng(latitude, longitude);
                 getMeetingPointLocation().postValue(latLng);
-                Log.d("PAHOJOIN","Se recibe mensaje de meeting point location");
             }
         }
     }
@@ -147,7 +150,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     @Override
     protected void onCleared() {
         super.onCleared();
-        Log.d("Oncleared","oncleared executed");
         locationManager.removeUpdates(this);
         pahoClient.disconnect();
 

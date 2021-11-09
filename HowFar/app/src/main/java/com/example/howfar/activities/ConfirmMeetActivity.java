@@ -20,7 +20,6 @@ public class ConfirmMeetActivity extends AppCompatActivity {
     private String placeTitle;
     private Double lat;
     private Double longit;
-    private String nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +32,6 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         placeTitle = intent.getStringExtra("placeName");
         placeName.setText(placeTitle);
         setupMapFragment();
-
     }
 
     @Override
@@ -47,9 +45,8 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         toMeetActivity.putExtra("placeLongitude", longit);
         toMeetActivity.putExtra("placeName",placeTitle);
         toMeetActivity.putExtra("meetingCreator",true);
+        toMeetActivity.putExtra("nickname", getIntent().getStringExtra("nickname"));
         startActivity(toMeetActivity);
-
-
     }
 
     private void setupMapFragment() {

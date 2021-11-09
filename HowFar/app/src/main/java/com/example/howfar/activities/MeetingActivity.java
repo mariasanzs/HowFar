@@ -80,16 +80,12 @@ public class MeetingActivity  extends AppCompatActivity
             creator = true;
             meetId = UUID.randomUUID().toString();
             meetId = meetId.substring(0,7);
-            viewModel.initalizeMqttClient(meetId);
-            Log.d("PAHOJOIN", "Localización publicada ");
         } else {
             creator = false;
-            //Coger idmeeting de la actividad de join
             meetId = intent.getStringExtra("idMeeting");
-            viewModel.initalizeMqttClient(meetId);
-            Log.d("PAHOJOIN","Se ha añadido el cliente");
         }
-        Log.d("PAHOJOIN","LLega Aquí");
+        viewModel.initalizeMqttClient(meetId);
+        viewModel.setNickname(getIntent().getStringExtra("nickname"));
         viewModel.getParticipants()
                 .observe(this, participant -> onParticipantDistanceChanged(participant));
         viewModel.getCurrentLocation()
