@@ -17,6 +17,11 @@
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/fragmentmaps.xml" value="0.14266304347826086" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/list_of_places.xml" value="0.1408514492753623" />
         <entry key="..\:/Users/Usuario/Desktop/masterIoT/MobileDeviceProgramming/HowFar/HowFar/app/src/main/res/layout/place_layout.xml" value="0.14175724637681159" />
+        <entry key="app/src/main/res/drawable/ic_mic.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/layout/activity_confirm.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1286231884057971" />
+        <entry key="app/src/main/res/layout/fragment_maps.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/list_of_places.xml" value="0.21875" />
       </map>
     </option>
   </component>

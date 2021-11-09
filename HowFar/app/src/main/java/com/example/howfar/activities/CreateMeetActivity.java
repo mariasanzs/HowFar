@@ -6,10 +6,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -94,6 +100,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         progressDialog.show();
         //Obtiene referencia en Layout de WebView.
     }
+
     private void initCreateMeetActivity(String string_result){
         if (listofcinemasinitialized == false) {
             Log.d(LOGSLOADWEBCONTENT, "message received from background thread");

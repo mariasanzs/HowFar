@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,9 +19,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -49,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private boolean listofcinemasinitialized = false;
     private SwitchCompat bAccess;
     private TextToSpeech mTTS;
+    //STT
+    TextView micTextTitle;
+    ImageButton micVoiceButton;
+    private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,17 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                 }
             }
         });
+        //STT
+        micTextTitle = findViewById(R.id.micTitle);
+        micVoiceButton = findViewById(R.id.voiceButton);
+        // button click to show speech to text dialog
+        micVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                speak();
+            }
+        });
+        //
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         if (!viewModel.getSensorStatus().hasObservers()) {
             viewModel.getSensorStatus().observe(this, bool -> onProximitySensorChanged(bool));
@@ -238,4 +257,31 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }
         return false;
     }
+
+    private void speak() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi speak something");
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+        }catch (Exception e){
+            Toast.makeText(this, ""+ e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CODE_SPEECH_INPUT:{
+                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                micTextTitle.setText(result.get(0));
+            }
+            break;
+        }
+    }
 }
+
