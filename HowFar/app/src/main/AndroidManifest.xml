@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +27,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
         <activity
+            android:name=".activities.MeetingActivity"
+            android:parentActivityName=".activities.ConfirmMeetActivity"
+            android:exported="true" />
+        <activity
             android:name=".activities.ConfirmMeetActivity"
             android:exported="true" />
         <activity
@@ -37,6 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name="org.eclipse.paho.android.service.MqttService"/>
     </application>
 
 </manifest>

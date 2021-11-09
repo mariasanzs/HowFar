@@ -1,4 +1,4 @@
-package com.example.howfar.activities;
+package com.example.howfar.model;
 
 import java.io.Serializable;
 
@@ -8,7 +8,7 @@ public class Place implements Serializable {
     private double latitude;
 
 
-    Place(String title, double longitude, double latitude) {
+    public Place(String title, double longitude, double latitude) {
         this.title = title;
         this.longitude = longitude;
         this.latitude = latitude;

@@ -3,7 +3,6 @@ package com.example.howfar.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -18,11 +17,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
+import com.example.howfar.model.Place;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
     private Button createMeetButton;
@@ -30,12 +29,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private Button goJoinFormButton;
     private Button cancelJoinFormButton;
     private EditText nameField;
+    private EditText joinIdField;
     private TextView helloText;
     private View tintView;
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
     private List<Place> places = new ArrayList<>();
-    private boolean listofcinemasinitialized = false;
+    private String nickname;
+    private String joinIdMeeting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (viewModel.getNickname().trim() != "") {
             nameField.setText(viewModel.getNickname());
         }
+        joinIdField = findViewById(R.id.joinIdField);
+        joinIdField.addTextChangedListener(this);
+        joinIdField.setOnKeyListener(this);
+
+
     }
 
     private void showJoinForm() {
@@ -84,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
+
+
     }
 
 
@@ -98,11 +106,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void goJoinFormButtonPressed() {
-
+        joinIdMeeting = joinIdField.getText().toString();
+        Intent i = new Intent(this, MeetingActivity.class);
+        i.putExtra("idMeeting", joinIdMeeting);
+        startActivity(i);
     }
 
     private boolean validateNameField() {
         if (nameField.getText().toString().matches("^[a-zA-Z0-9]{4,}$")) {
+            nickname = nameField.getText().toString();
             return true;
         }
         nameField.setError("Nickname must contain at least 4 non special characters");
@@ -120,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private void createMeetButtonPressed() {
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
+            intent.putExtra("nickname", nickname);
             startActivity(intent);
 
         }

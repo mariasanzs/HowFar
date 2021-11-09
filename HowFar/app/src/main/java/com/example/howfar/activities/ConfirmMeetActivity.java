@@ -2,6 +2,7 @@ package com.example.howfar.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,22 +13,43 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class ConfirmMeetActivity extends AppCompatActivity {
     private Intent intent;
+    private Intent toMeetActivity;
     private MapsFragment mapFragment;
     private TextView placeName;
+    private Button bConfirm;
+    private String placeTitle;
+    private Double lat;
+    private Double longit;
+    private String nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm);
         placeName = findViewById(R.id.placeName);
+        bConfirm = findViewById(R.id.buttonConfirm);
+        bConfirm.setOnClickListener(view -> clickConfirmMeeting());
         intent = getIntent();
-        placeName.setText(intent.getStringExtra("placeName"));
+        placeTitle = intent.getStringExtra("placeName");
+        placeName.setText(placeTitle);
         setupMapFragment();
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    private void clickConfirmMeeting(){
+        toMeetActivity = new Intent(this ,MeetingActivity.class);
+        toMeetActivity.putExtra("placeLatitude", lat);
+        toMeetActivity.putExtra("placeLongitude", longit);
+        toMeetActivity.putExtra("placeName",placeTitle);
+        toMeetActivity.putExtra("meetingCreator",true);
+        startActivity(toMeetActivity);
+
+
     }
 
     private void setupMapFragment() {
@@ -36,8 +58,8 @@ public class ConfirmMeetActivity extends AppCompatActivity {
                 .beginTransaction()
                 .add(R.id.fragmentContainerView, mapFragment)
                 .commit();
-        Double lat = intent.getDoubleExtra("placeLatitude", 0);
-        Double longit = intent.getDoubleExtra("placeLongitude", 0);
+        lat = intent.getDoubleExtra("placeLatitude", 0);
+        longit = intent.getDoubleExtra("placeLongitude", 0);
         mapFragment.setMarker(new LatLng(lat, longit));
     }
 }

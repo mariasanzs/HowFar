@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
-import com.example.howfar.activities.Place;
+import com.example.howfar.model.Place;
 
 public class ViewHolder extends RecyclerView.ViewHolder {
 
