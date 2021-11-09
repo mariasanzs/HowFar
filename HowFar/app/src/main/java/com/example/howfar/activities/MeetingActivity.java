@@ -8,15 +8,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,13 +42,14 @@ public class MeetingActivity  extends AppCompatActivity
     private Double lat;
     private Double longit;
     private MapsFragment mapFragment;
-    private LocationManager locationManager;
     private String meetId;
     private MeetingActivityViewModel viewModel;
     private ProgressDialog progressDialog;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
+    private Button finishButton;
+
 
     Intent intent;
     @Override
@@ -59,6 +61,9 @@ public class MeetingActivity  extends AppCompatActivity
         progressDialog.show();
         setContentView(R.layout.meeting_layout);
         fab = findViewById(R.id.fab);
+        finishButton = findViewById(R.id.finishButton);
+        finishButton.setOnClickListener(view -> finishButtonPressed());
+
         mRecyclerView = findViewById(R.id.history_recycler_view);
         viewModel = new ViewModelProvider(this).get(MeetingActivityViewModel.class);
 
@@ -92,6 +97,13 @@ public class MeetingActivity  extends AppCompatActivity
         viewModel.getPahoClientConnectionStatus()
                 .observe(this, status -> onPahoClientConnectionStatusChanged(status));
         fab.setOnClickListener(view -> sharingId());
+    }
+
+    private void finishButtonPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void sharingId() {
