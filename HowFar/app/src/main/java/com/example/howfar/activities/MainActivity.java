@@ -31,6 +31,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
+import com.example.howfar.model.Place;
 import com.example.howfar.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private Button goJoinFormButton;
     private Button cancelJoinFormButton;
     private EditText nameField;
+    private EditText joinIdField;
     private TextView helloText;
     private View tintView;
     private ConstraintLayout joinMeetForm;
@@ -55,7 +57,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     //STT
     ImageButton micVoiceButton;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
-
+    private String nickname;
+    private String joinIdMeeting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +165,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (viewModel.getNickname().trim() != "") {
             nameField.setText(viewModel.getNickname());
         }
+        joinIdField = findViewById(R.id.joinIdField);
+        joinIdField.addTextChangedListener(this);
+        joinIdField.setOnKeyListener(this);
+
+
     }
 
     private void showJoinForm() {
@@ -172,6 +180,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
+
+
     }
 
 
@@ -192,10 +202,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (viewModel.appShouldTalk) {
             mTTS.speak("Going to the Meeting", TextToSpeech.QUEUE_FLUSH, null);
         }
+        joinIdMeeting = joinIdField.getText().toString();
+        Intent i = new Intent(this, MeetingActivity.class);
+        i.putExtra("idMeeting", joinIdMeeting);
+        startActivity(i);
     }
 
     private boolean validateNameField() {
         if (nameField.getText().toString().matches("^[a-zA-Z0-9]{4,}$")) {
+            nickname = nameField.getText().toString();
             return true;
         }
         nameField.setError("Nickname must contain at least 4 non special characters");
@@ -219,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
+            intent.putExtra("nickname", nickname);
             startActivity(intent);
         }
     }
@@ -272,7 +288,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi speak something");
-
         try {
             startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
         }catch (Exception e){
@@ -291,13 +306,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case REQUEST_CODE_SPEECH_INPUT:{
-                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                nameField.setText(result.get(0).toString().replace(" ",""));
+        if(resultCode == RESULT_OK){
+            switch (requestCode) {
+                case REQUEST_CODE_SPEECH_INPUT:{
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    nameField.setText(result.get(0).toString().replace(" ",""));
+                    break;
+                }
             }
-            break;
+        }else{
+            nameField.setText("");
         }
     }
 }

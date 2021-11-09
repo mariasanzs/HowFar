@@ -21,7 +21,9 @@
         <entry key="app/src/main/res/layout/activity_confirm.xml" value="0.21875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_maps.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/history.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/list_of_places.xml" value="0.21875" />
+        <entry key="app/src/main/res/layout/place_layout.xml" value="0.190625" />
       </map>
     </option>
   </component>

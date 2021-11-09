@@ -25,6 +25,7 @@ import com.example.howfar.R;
 import com.example.howfar.adapter.RecyclerViewAdapter;
 import com.example.howfar.background.LoadWebContent;
 import com.example.howfar.viewmodels.MainActivityViewModel;
+import com.example.howfar.model.Place;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,13 +86,19 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
             public void handleMessage(@NonNull Message msg) {
                 String string_result;
                 super.handleMessage(msg);
-                if ((string_result = msg.getData().getString("text")) != null) {
+                string_result = msg.getData().getString("text");
+                if (string_result != null && string_result != "") {
                     initCreateMeetActivity(string_result);
                     initRecyclerView();
                     progressDialog.dismiss();
                     if (viewModel.appShouldTalk) {
                         mTTS.speak("Choose a meeting point", TextToSpeech.QUEUE_FLUSH, null);
                     }
+                }else{
+                    Toast.makeText(CreateMeetActivity.this,
+                            "It was not possible to get content from the web",
+                            Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
         };
@@ -103,9 +110,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
 
     private void initCreateMeetActivity(String string_result){
         if (listofcinemasinitialized == false) {
-            Log.d(LOGSLOADWEBCONTENT, "message received from background thread");
             try {
-                Log.d(LOGSLOADWEBCONTENT, string_result);
                 JSONObject obj = new JSONObject(string_result);
                 // fetch JSONObject named employee
                 JSONArray graph = obj.getJSONArray("@graph");
@@ -116,12 +121,15 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                     JSONObject location = cinema.getJSONObject("location");
                     double latitude = location.getDouble("latitude");
                     double longitude = location.getDouble("longitude");
-                    Log.d(LOGSLOADWEBCONTENT, String.valueOf(longitude));
                     places.add(new Place(title,longitude,latitude));
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                Toast.makeText(CreateMeetActivity.this,
+                        "It was not possible to get content from the web",
+                        Toast.LENGTH_LONG).show();
+                finish();
             }
             listofcinemasinitialized = true;
         }

@@ -23,6 +23,7 @@ import com.example.howfar.activities.MainActivity;
 
 public class MainActivityViewModel extends AndroidViewModel implements SensorEventListener {
     private String userNickname;
+    private String joinId;
     private SharedPreferences preferences;
     private String preferencesFile;
     private final String NICKNAMEKEY = "userName";
