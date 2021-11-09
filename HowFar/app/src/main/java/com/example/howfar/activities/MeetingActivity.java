@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,7 +37,6 @@ public class MeetingActivity  extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
     private boolean creator = false;
     private Double lat;
     private Double longit;
@@ -76,6 +74,7 @@ public class MeetingActivity  extends AppCompatActivity
         if (intent.getBooleanExtra("meetingCreator", false)) {
             creator = true;
             meetId = UUID.randomUUID().toString();
+            meetId = meetId.substring(0,7);
             viewModel.initalizeMqttClient(meetId);
             Log.d("PAHOJOIN", "Localización publicada ");
         } else {

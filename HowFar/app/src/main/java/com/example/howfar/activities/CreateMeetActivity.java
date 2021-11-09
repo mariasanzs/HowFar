@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,10 +54,16 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
             public void handleMessage(@NonNull Message msg) {
                 String string_result;
                 super.handleMessage(msg);
-                if ((string_result = msg.getData().getString("text")) != null) {
+                string_result = msg.getData().getString("text");
+                if (string_result != null && string_result != "") {
                     initCreateMeetActivity(string_result);
                     initRecyclerView();
                     progressDialog.dismiss();
+                }else{
+                    Toast.makeText(CreateMeetActivity.this,
+                            "It was not possible to get content from the web",
+                            Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
         };
@@ -87,6 +93,10 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                Toast.makeText(CreateMeetActivity.this,
+                        "It was not possible to get content from the web",
+                        Toast.LENGTH_LONG).show();
+                finish();
             }
             listofcinemasinitialized = true;
         }

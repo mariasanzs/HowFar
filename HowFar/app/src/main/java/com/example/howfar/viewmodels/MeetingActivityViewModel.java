@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,7 +20,6 @@ import com.example.howfar.paho.PahoClient;
 import com.example.howfar.paho.PahoClientListener;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 
 public class MeetingActivityViewModel extends AndroidViewModel implements
@@ -77,7 +75,7 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     public void beginRequestingLocation() {
         if (ContextCompat.checkSelfPermission(application.getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
         }
     }
 
