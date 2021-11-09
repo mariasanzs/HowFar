@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private ArrayList<String> history;
+    private HashMap<String, String> history;
 
-    public HistoryAdapter(ArrayList<String> dataSet) {
+    public HistoryAdapter(HashMap<String, String> dataSet) {
         history = dataSet;
     }
 
@@ -28,14 +28,16 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return new ViewHolder(view);
     }
 
-    public void add(String data) {
-        history.add(data);
+    public void add(String nickname, String distance) {
+        history.put(nickname, distance);
         this.notifyDataSetChanged();
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.mTextView.setText(history.get(position));
+        holder.historyNicknameTextView.setText(history.get(position));
+        holder.historyDistanceTextView.setText(history.get(position));
+
     }
 
     @Override
@@ -44,11 +46,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
+        public TextView historyNicknameTextView;
+        public TextView historyDistanceTextView;
 
         public ViewHolder(View view) {
             super(view);
-            mTextView = view.findViewById(R.id.row_text);
+            historyNicknameTextView = view.findViewById(R.id.historyNickname);
+            historyDistanceTextView = view.findViewById(R.id.historyDistance);
+
         }
     }
 

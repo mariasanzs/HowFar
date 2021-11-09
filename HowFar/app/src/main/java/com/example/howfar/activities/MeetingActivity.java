@@ -30,7 +30,7 @@ import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class MeetingActivity  extends AppCompatActivity
@@ -66,7 +66,7 @@ public class MeetingActivity  extends AppCompatActivity
         intent = getIntent();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new HistoryAdapter(new ArrayList<>());
+        mAdapter = new HistoryAdapter(new HashMap<>());
         mRecyclerView.setAdapter(mAdapter);
 
         setupMapFragment();
@@ -147,8 +147,7 @@ public class MeetingActivity  extends AppCompatActivity
         // Añadir participant a la lista y refrescarla
         String nickname = participant.nickname;
         String distance = Integer.toString(participant.distanceToLocation);
-        String historymessage = nickname+":"+distance;
-        mAdapter.add(historymessage);
+        mAdapter.add(nickname, distance + "m");
         mAdapter.notifyDataSetChanged();
     }
 
