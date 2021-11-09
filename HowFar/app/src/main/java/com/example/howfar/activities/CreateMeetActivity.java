@@ -102,7 +102,6 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-
     @Override
     public void onItemClick(int position) {
         Place place = places.get(position);

@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private MainActivityViewModel viewModel;
     private List<Place> places = new ArrayList<>();
     private boolean listofcinemasinitialized = false;
-    private SwitchCompat bProx;
+    private SwitchCompat bAccess;
     private TextToSpeech mTTS;
 
     @Override
@@ -95,15 +95,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     public void onProximitySensorChanged(Boolean bool) {
         if (bool) {
-            bProx.setChecked(true);
+            bAccess.setChecked(true);
             mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
         }
-
     }
 
     private void initializeViews() {
-        bProx = findViewById(R.id.bProx);
-        bProx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        bAccess = findViewById(R.id.bAccess);
+        bAccess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b){
                 viewModel.switchChanged(b);
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                 }
             }
         });
-        bProx.setChecked(viewModel.appShouldTalk);
+        bAccess.setChecked(viewModel.appShouldTalk);
         tintView = findViewById(R.id.tintView);
         tintView.setVisibility(View.GONE);
         tintView.setAlpha(0.0f);
