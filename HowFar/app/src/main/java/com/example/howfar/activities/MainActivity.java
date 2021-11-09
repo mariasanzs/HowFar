@@ -85,7 +85,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         micVoiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                speak();
+                if (viewModel.appShouldTalk) {
+                    speak();
+                }
             }
         });
         //
@@ -106,14 +108,20 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     protected void onStart() {
         super.onStart();
         if (viewModel.appShouldTalk) {
+            micVoiceButton.setVisibility(View.VISIBLE);
             mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }else{
+            micVoiceButton.setVisibility(View.GONE);
         }
     }
 
     public void onProximitySensorChanged(Boolean bool) {
         if (bool) {
             bAccess.setChecked(true);
+            micVoiceButton.setVisibility(View.VISIBLE);
             mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }else{
+            micVoiceButton.setVisibility(View.GONE);
         }
     }
 
@@ -124,7 +132,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             public void onCheckedChanged(CompoundButton compoundButton, boolean b){
                 viewModel.switchChanged(b);
                 if (b) {
+                    micVoiceButton.setVisibility(View.VISIBLE);
                     mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+                }else{
+                    micVoiceButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -267,6 +278,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }catch (Exception e){
             Toast.makeText(this, ""+ e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && viewModel.appShouldTalk){
+            speak();
+        }
+        return true;
     }
 
     @Override
