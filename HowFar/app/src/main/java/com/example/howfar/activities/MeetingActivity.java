@@ -45,13 +45,12 @@ public class MeetingActivity  extends AppCompatActivity
     private String meetId;
     private MeetingActivityViewModel viewModel;
     private ProgressDialog progressDialog;
+    private Button finishButton;
     HistoryAdapter mAdapter;
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
-    private Button finishButton;
-
-
     Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +87,6 @@ public class MeetingActivity  extends AppCompatActivity
         viewModel.setNickname(getIntent().getStringExtra("nickname"));
         viewModel.getParticipants()
                 .observe(this, participant -> onParticipantDistanceChanged(participant));
-        viewModel.getCurrentLocation()
-                .observe(this, location -> onLocationChanged(location));
         viewModel.getPahoClientConnectionStatus()
                 .observe(this, status -> onPahoClientConnectionStatusChanged(status));
         fab.setOnClickListener(view -> sharingId());
@@ -145,10 +142,6 @@ public class MeetingActivity  extends AppCompatActivity
         } else {
             requestLocationPermissions();
         }
-    }
-
-   private void onLocationChanged(Location location) {
-        Toast.makeText(this, location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT).show();
     }
 
     private void onParticipantDistanceChanged(Participant participant) {

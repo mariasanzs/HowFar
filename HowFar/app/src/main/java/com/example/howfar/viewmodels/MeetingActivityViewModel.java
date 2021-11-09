@@ -28,7 +28,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         PahoClientListener
 {
     private MutableLiveData<Participant> participants;
-    private MutableLiveData<Location> currentLocation;
     private MutableLiveData<LatLng> meetingPointLocation;
     private MutableLiveData<PahoClient.ConnectionStatus> pahoClientConnectionStatus;
     private ArrayList<String> topics = new ArrayList<>();
@@ -54,13 +53,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
         return participants;
     }
 
-    public MutableLiveData<Location> getCurrentLocation() {
-        if (currentLocation == null) {
-            currentLocation = new MutableLiveData<>();
-        }
-        return currentLocation;
-    }
-
     public MutableLiveData<PahoClient.ConnectionStatus> getPahoClientConnectionStatus() {
         if (pahoClientConnectionStatus == null) {
             pahoClientConnectionStatus = new MutableLiveData<>();
@@ -78,7 +70,13 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     public void beginRequestingLocation() {
         if (ContextCompat.checkSelfPermission(application.getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-
+            Location lastLocation = null;
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+            publishCurrentDistance(lastLocation);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
         }
     }
@@ -102,13 +100,17 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        getCurrentLocation().postValue(location);
-        // Calcular distancia al sitio
-        Location meetingPoint = new Location("");
         LatLng latLongMeeting = getMeetingPointLocation().getValue();
         if (latLongMeeting != null && pahoClient.isConnected()) {
-            meetingPoint.setLatitude(latLongMeeting.latitude);
-            meetingPoint.setLongitude(latLongMeeting.longitude);
+            publishCurrentDistance(location);
+        }
+    }
+
+    private void publishCurrentDistance(Location location) {
+        if (location != null) {
+            Location meetingPoint = new Location("");
+            meetingPoint.setLatitude(location.getLatitude());
+            meetingPoint.setLongitude(location.getLongitude());
             float fDistance = location.distanceTo(meetingPoint);
             Integer distance = new Integer((int) fDistance);
             String nickname = pahoClient.getUserNickname();
