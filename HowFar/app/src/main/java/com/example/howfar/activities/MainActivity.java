@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private Button goJoinFormButton;
     private Button cancelJoinFormButton;
     private EditText nameField;
-    private EditText joinId;
+    private EditText joinIdField;
     private TextView helloText;
     private View tintView;
     private ConstraintLayout joinMeetForm;
@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         if (viewModel.getNickname().trim() != "") {
             nameField.setText(viewModel.getNickname());
         }
-        joinId= findViewById(R.id.nameField);
-        joinId.addTextChangedListener(this);
-        joinId.setOnKeyListener(this);
+        joinIdField = findViewById(R.id.joinIdField);
+        joinIdField.addTextChangedListener(this);
+        joinIdField.setOnKeyListener(this);
 
 
     }
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
-        joinIdMeeting = joinId.getText().toString();
+        joinIdMeeting = joinIdField.getText().toString();
 
     }
 

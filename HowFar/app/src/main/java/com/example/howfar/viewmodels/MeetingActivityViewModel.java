@@ -66,8 +66,6 @@ public class MeetingActivityViewModel extends AndroidViewModel implements
     public MutableLiveData<LatLng> getMeetingPointLocation() {
         if (meetingPointLocation == null) {
             meetingPointLocation = new MutableLiveData<>();
-            Log.d("PAHOJOIN","El meeting point location estaba a null");
-
         }
         return meetingPointLocation;
     }

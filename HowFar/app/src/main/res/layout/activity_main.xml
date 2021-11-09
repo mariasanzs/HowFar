@@ -95,7 +95,7 @@
             app:layout_constraintTop_toTopOf="@+id/goJoinFormButton" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName2"
+            android:id="@+id/joinIdField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

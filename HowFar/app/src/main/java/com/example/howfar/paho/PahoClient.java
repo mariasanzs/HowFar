@@ -56,7 +56,7 @@ public class PahoClient {
 
             @Override
             public void connectionLost(Throwable cause) {
-                // Not implemented
+                Log.d("PAHOCONNECTIONLOST","Connection Lost");
             }
 
             @Override
