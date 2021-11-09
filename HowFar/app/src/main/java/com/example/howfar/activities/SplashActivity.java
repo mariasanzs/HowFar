@@ -2,12 +2,13 @@ package com.example.howfar.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.logging.Handler;
+
 
 public class SplashActivity extends AppCompatActivity {
     @Override
@@ -16,11 +17,11 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
-        }, 3000);
+        }, 2000);
 
     }
 }
