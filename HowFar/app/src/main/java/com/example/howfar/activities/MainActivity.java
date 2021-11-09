@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private SwitchCompat bAccess;
     private TextToSpeech mTTS;
     //STT
-    TextView micTextTitle;
     ImageButton micVoiceButton;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
 
@@ -81,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             }
         });
         //STT
-        micTextTitle = findViewById(R.id.micTitle);
         micVoiceButton = findViewById(R.id.voiceButton);
         // button click to show speech to text dialog
         micVoiceButton.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         switch (requestCode) {
             case REQUEST_CODE_SPEECH_INPUT:{
                 ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                micTextTitle.setText(result.get(0));
+                nameField.setText(result.get(0).toString().replace(" ",""));
             }
             break;
         }

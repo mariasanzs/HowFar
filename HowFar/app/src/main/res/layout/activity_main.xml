@@ -32,34 +32,21 @@
         app:layout_constraintStart_toStartOf="@+id/helloTextView"
         app:layout_constraintTop_toBottomOf="@+id/helloTextView" />
 
-    <TextView
-        android:id="@+id/micTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="108dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:text="Press mic button to input voice..."
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageButton
         android:id="@+id/voiceButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:background="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_mic"
-        tools:layout_editor_absoluteX="165dp"
-        tools:layout_editor_absoluteY="142dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="10dp"
+        tools:layout_editor_absoluteY="809dp"
+        app:layout_constraintEnd_toEndOf="@+id/nameField"
+        app:layout_constraintStart_toStartOf="@+id/nameField"
+        app:layout_constraintTop_toBottomOf="@+id/nameField" />
+    />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
@@ -69,6 +56,13 @@
         app:layout_constraintEnd_toEndOf="@+id/nameField"
         app:layout_constraintStart_toStartOf="@+id/nameField"
         app:layout_constraintTop_toBottomOf="@+id/nameField">
+
+        <View
+            android:id="@+id/tintView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="#80000000" />
 
         <Button
             android:id="@+id/joinMeetButton"
@@ -100,17 +94,6 @@
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <View
-        android:id="@+id/tintView"
-        android:layout_width="wrap_content"
-        android:animateLayoutChanges="true"
-        android:layout_height="wrap_content"
-        android:background="#80000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/joinFormView"
         android:layout_width="0dp"
@@ -133,7 +116,8 @@
             android:textColor="@color/light_blue"
             app:layout_constraintBottom_toBottomOf="@+id/goJoinFormButton"
             app:layout_constraintEnd_toStartOf="@+id/goJoinFormButton"
-            app:layout_constraintTop_toTopOf="@+id/goJoinFormButton" />
+            app:layout_constraintTop_toTopOf="@+id/goJoinFormButton"
+            android:layout_marginRight="10dp" />
 
         <EditText
             android:id="@+id/editTextTextPersonName2"
@@ -162,7 +146,8 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2" />
+            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2"
+            android:layout_marginRight="10dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
