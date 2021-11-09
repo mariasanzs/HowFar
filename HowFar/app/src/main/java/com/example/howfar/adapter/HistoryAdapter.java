@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.howfar.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
@@ -30,13 +31,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public void add(String nickname, String distance) {
         history.put(nickname, distance);
-        this.notifyDataSetChanged();
+
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.historyNicknameTextView.setText(history.get(position));
-        holder.historyDistanceTextView.setText(history.get(position));
+        String distance = (new ArrayList<String>(history.values())).get(position);
+        String nickname = (new ArrayList<String>(history.keySet())).get(position);
+        holder.historyNicknameTextView.setText(nickname);
+        holder.historyDistanceTextView.setText(distance);
 
     }
 
