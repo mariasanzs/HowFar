@@ -53,7 +53,7 @@ public class MapsFragment extends Fragment {
         }
         googleMap.addMarker(new MarkerOptions()
                 .position(location)
-                .title("Ubicación")
+                .title("location")
         );
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(14.0F));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));

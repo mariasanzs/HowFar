@@ -2,18 +2,32 @@ package com.example.howfar.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
+import android.hardware.SensorEventListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.howfar.R;
@@ -22,8 +36,10 @@ import com.example.howfar.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener {
+public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnKeyListener{
     private Button createMeetButton;
     private Button joinMeetButton;
     private Button goJoinFormButton;
@@ -35,6 +51,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private ConstraintLayout joinMeetForm;
     private MainActivityViewModel viewModel;
     private List<Place> places = new ArrayList<>();
+    private boolean listofcinemasinitialized = false;
+    private SwitchCompat bAccess;
+    private TextToSpeech mTTS;
+    //STT
+    ImageButton micVoiceButton;
+    private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private String nickname;
     private String joinIdMeeting;
 
@@ -42,7 +64,40 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Configuration of Text To Speech (volume and speed)
+        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if(i == TextToSpeech.SUCCESS){
+                    int result = mTTS.setLanguage(Locale.ENGLISH);
+                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                        Log.e("TTS", "Language not suported");
+                    }else{
+                        //if everything is succesful
+                        mTTS.setPitch(0.5f);
+                        mTTS.setSpeechRate(0.5f);
+                    }
+                }else{
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
+        //STT
+        micVoiceButton = findViewById(R.id.voiceButton);
+        // button click to show speech to text dialog
+        micVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (viewModel.appShouldTalk) {
+                    speak();
+                }
+            }
+        });
+        //
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        if (!viewModel.getSensorStatus().hasObservers()) {
+            viewModel.getSensorStatus().observe(this, bool -> onProximitySensorChanged(bool));
+        }
         initializeViews();
     }
 
@@ -52,7 +107,42 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         viewModel.activityStopped();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (viewModel.appShouldTalk) {
+            micVoiceButton.setVisibility(View.VISIBLE);
+            mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }else{
+            micVoiceButton.setVisibility(View.GONE);
+        }
+    }
+
+    public void onProximitySensorChanged(Boolean bool) {
+        if (bool) {
+            bAccess.setChecked(true);
+            micVoiceButton.setVisibility(View.VISIBLE);
+            mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }else{
+            micVoiceButton.setVisibility(View.GONE);
+        }
+    }
+
     private void initializeViews() {
+        bAccess = findViewById(R.id.bAccess);
+        bAccess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b){
+                viewModel.switchChanged(b);
+                if (b) {
+                    micVoiceButton.setVisibility(View.VISIBLE);
+                    mTTS.speak("Introduce your nickname", TextToSpeech.QUEUE_FLUSH, null);
+                }else{
+                    micVoiceButton.setVisibility(View.GONE);
+                }
+            }
+        });
+        bAccess.setChecked(viewModel.appShouldTalk);
         tintView = findViewById(R.id.tintView);
         tintView.setVisibility(View.GONE);
         tintView.setAlpha(0.0f);
@@ -98,9 +188,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(true);
         createMeetButton.setEnabled(true);
         joinMeetButton.setEnabled(true);
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Cancelling going to the meeting", TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 
     private void goJoinFormButtonPressed() {
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Going to the Meeting", TextToSpeech.QUEUE_FLUSH, null);
+        }
         joinIdMeeting = joinIdField.getText().toString();
         Intent i = new Intent(this, MeetingActivity.class);
         i.putExtra("idMeeting", joinIdMeeting);
@@ -114,6 +210,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
             return true;
         }
         nameField.setError("Nickname must contain at least 4 non special characters");
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Invalid Nickname", TextToSpeech.QUEUE_FLUSH, null);
+        }
         return false;
     }
 
@@ -126,6 +225,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void createMeetButtonPressed() {
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Creating Meeting", TextToSpeech.QUEUE_FLUSH, null);
+        }
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
             intent.putExtra("nickname", viewModel.getNickname());
@@ -134,8 +236,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     }
 
     private void joinMeetButtonPressed() {
+        if (viewModel.appShouldTalk) {
+            mTTS.speak("Join Meeting", TextToSpeech.QUEUE_FLUSH, null);
+        }
         if (validateNameField()) {
             showJoinForm();
+            if (viewModel.appShouldTalk) {
+                mTTS.speak("Enter ID Meeting", TextToSpeech.QUEUE_ADD, null);
+            }
         }
     }
 
@@ -149,6 +257,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         String name = nameField.getText().toString();
         setHelloText(name);
         viewModel.nicknameChanged(name);
+        if (viewModel.appShouldTalk) {
+            mTTS.speak(nameField.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 
     @Override
@@ -167,4 +278,41 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }
         return false;
     }
+
+    private void speak() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi speak something");
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+        }catch (Exception e){
+            Toast.makeText(this, ""+ e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && viewModel.appShouldTalk){
+            speak();
+        }
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            switch (requestCode) {
+                case REQUEST_CODE_SPEECH_INPUT:{
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    nameField.setText(result.get(0).toString().replace(" ",""));
+                    break;
+                }
+            }
+        }else{
+            nameField.setText("");
+        }
+    }
 }
+
