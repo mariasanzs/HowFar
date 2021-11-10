@@ -59,12 +59,6 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         placeTitle = intent.getStringExtra("placeName");
         placeName.setText(placeTitle);
         setupMapFragment();
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     private void clickConfirmMeeting(){
@@ -76,9 +70,8 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         toMeetActivity.putExtra("placeLongitude", longit);
         toMeetActivity.putExtra("placeName",placeTitle);
         toMeetActivity.putExtra("meetingCreator",true);
+        toMeetActivity.putExtra("nickname", getIntent().getStringExtra("nickname"));
         startActivity(toMeetActivity);
-
-
     }
 
     private void setupMapFragment() {

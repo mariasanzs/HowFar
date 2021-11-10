@@ -168,8 +168,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinIdField = findViewById(R.id.joinIdField);
         joinIdField.addTextChangedListener(this);
         joinIdField.setOnKeyListener(this);
-
-
     }
 
     private void showJoinForm() {
@@ -180,11 +178,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
-
-
     }
-
-
+    
     private void hideJoinForm() {
         joinMeetForm.setVisibility(View.GONE);
         tintView.setVisibility(View.GONE);
@@ -205,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinIdMeeting = joinIdField.getText().toString();
         Intent i = new Intent(this, MeetingActivity.class);
         i.putExtra("idMeeting", joinIdMeeting);
+        i.putExtra("nickname", viewModel.getNickname());
         startActivity(i);
     }
 
@@ -234,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         }
         if (validateNameField()){
             Intent intent = new Intent(this  , CreateMeetActivity.class);
-            intent.putExtra("nickname", nickname);
+            intent.putExtra("nickname", viewModel.getNickname());
             startActivity(intent);
         }
     }

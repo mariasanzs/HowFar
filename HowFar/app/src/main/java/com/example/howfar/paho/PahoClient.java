@@ -1,13 +1,8 @@
 package com.example.howfar.paho;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import androidx.lifecycle.MutableLiveData;
-
-import com.example.howfar.R;
 import com.example.howfar.model.MqttContent;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -26,20 +21,13 @@ public class PahoClient {
     public enum ConnectionStatus { SUCCEEDED, FAILURE };
     private PahoClientListener listener;
     final String serverUri = "tcp://broker.hivemq.com:1883";
-    private final String preferencesFile;
-    String lastWillMessage = "Goodbye!";
     MqttAndroidClient mqttAndroidClient;
     String clientId;
-    String userNickname;
-    private SharedPreferences preferences;
-    private MutableLiveData<MqttContent> lastReceivedMessage;
-    private final String NICKNAMEKEY = "userName";
+    public ArrayList<MqttContent> messagesQueue;
     ArrayList<String> clientTopics;
     public PahoClient(Application application, ArrayList<String> topics, PahoClientListener listener) {
         this.listener = listener;
-        preferencesFile = application.getString(R.string.shared_preferences_file);
-        preferences = application.getSharedPreferences(preferencesFile, Context.MODE_PRIVATE);
-        userNickname = preferences.getString(NICKNAMEKEY, "");
+        this.messagesQueue = new ArrayList<>();
         clientId = clientId + System.currentTimeMillis();
         clientTopics = topics;
         mqttAndroidClient = new MqttAndroidClient(application.getApplicationContext(), serverUri, clientId);
@@ -48,6 +36,7 @@ public class PahoClient {
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     // Because Clean Session is true, we need to re-subscribe
+                    Log.d("HOWFARLOG","Paho Client: Reconnecting");
                     for (String topic : clientTopics) {
                         subscribeToTopic(topic);
                     }
@@ -56,14 +45,16 @@ public class PahoClient {
 
             @Override
             public void connectionLost(Throwable cause) {
-                Log.d("PAHOCONNECTIONLOST","Connection Lost");
+                Log.d("HOWFARLOG","Paho Client: Connection Lost");
             }
 
             @Override
             public void messageArrived(String topic, MqttMessage message) {
                 String payload = new String(message.getPayload());
                 MqttContent mqttContent = new MqttContent(topic, payload);
-                lastReceivedMessage.postValue(mqttContent);
+                Log.d("HOWFARLOG","Received message from " + topic + payload);
+                messagesQueue.add(mqttContent);
+                listener.onMessageArrived();
             }
 
             @Override
@@ -71,17 +62,15 @@ public class PahoClient {
 
             }
         });
-        Log.d("PAHO", isConnected() ? "YES" : "NO");
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
-        byte[] payload = lastWillMessage.getBytes();
-        mqttConnectOptions.setWill("distance",payload,0,false);
         mqttConnectOptions.setCleanSession(true);
 
         try {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
+                    listener.onConnectionCompleted();
                     DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
                     disconnectedBufferOptions.setBufferEnabled(true);
                     disconnectedBufferOptions.setBufferSize(100);
@@ -91,12 +80,12 @@ public class PahoClient {
                     for (String topic : clientTopics) {
                         subscribeToTopic(topic);
                     }
-                    listener.onConnectionCompleted();
+                    Log.d("HOWFARLOG","Paho Client: Connection completed!");
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("PAHOJOIN", "Failed to connect to: " + serverUri +
+                    Log.d("HOWFARLOG", "Failed to connect to: " + serverUri +
                             ". Cause: " + ((exception.getCause() == null)?
                             exception.toString() : exception.getCause()));
                     listener.onConnectionFailed();
@@ -112,12 +101,12 @@ public class PahoClient {
             mqttAndroidClient.subscribe(topic, 1, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("PAHOJOIN","Subscribed to " + topic);
+                    Log.d("HOWFARLOG","Subscribed to " + topic);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("PAHOJOIN","Failed to subsribe");
+                    Log.d("HOWFARLOG","Failed to subsribe");
                 }
             });
         } catch (MqttException e) {
@@ -128,35 +117,24 @@ public class PahoClient {
     public void publishMessage(String topic, String publishMessage, boolean retain) {
         MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());
-        Log.d("PAHOJOIN","config mensaje");
         message.setRetained(retain);
         message.setQos(1);
         try {
             mqttAndroidClient.publish(topic,message);
+            Log.d("HOWFARLOG","Published message to topic. Message: " + message.getPayload().toString() + " Topic: " + topic);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public MutableLiveData<MqttContent> getLastReceivedMessage() {
-        if (lastReceivedMessage == null) {
-            lastReceivedMessage = new MutableLiveData<>();
-        }
-        return lastReceivedMessage;
-    }
-
-    public String getUserNickname(){
-        return userNickname;
-    }
-
-    public boolean isConnected() {
+    public boolean isConnected()  {
         return mqttAndroidClient.isConnected();
     }
 
     public void disconnect() {
         try {
+            Log.d("HOWFARLOG","Paho Client: Disconnected");
             mqttAndroidClient.disconnect();
-            lastReceivedMessage = null;
             listener = null;
         } catch (MqttException e) {
             e.printStackTrace();

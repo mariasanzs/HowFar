@@ -6,6 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
+    <View
+        android:id="@+id/tintView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="#B9000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/nameField"
+        app:layout_constraintStart_toStartOf="@+id/nameField"
+        app:layout_constraintTop_toBottomOf="@+id/nameField">
+
+        <Button
+            android:id="@+id/joinMeetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/sea_blue"
+            android:text="Join Meet" />
+
+        <Button
+            android:id="@+id/createMeetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/sea_blue"
+            android:text="Create Meet" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/helloTextView"
         android:layout_width="0dp"
@@ -46,42 +84,10 @@
         tools:layout_editor_absoluteY="809dp"
         app:layout_constraintEnd_toEndOf="@+id/nameField"
         app:layout_constraintStart_toStartOf="@+id/nameField"
-        app:layout_constraintTop_toBottomOf="@+id/nameField" />
+        app:layout_constraintTop_toBottomOf="@+id/nameField" /><![CDATA[
     />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/nameField"
-        app:layout_constraintStart_toStartOf="@+id/nameField"
-        app:layout_constraintTop_toBottomOf="@+id/nameField">
-
-        <View
-            android:id="@+id/tintView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:background="#80000000" />
-
-        <Button
-            android:id="@+id/joinMeetButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="@color/sea_blue"
-            android:text="Join Meet" />
-
-        <Button
-            android:id="@+id/createMeetButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/sea_blue"
-            android:text="Create Meet" />
-
-    </LinearLayout>
+    ]]>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/bAccess"

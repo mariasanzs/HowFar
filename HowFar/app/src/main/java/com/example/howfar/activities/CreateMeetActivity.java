@@ -37,8 +37,6 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-
-
 public class CreateMeetActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
 
     private RecyclerView recyclerView;
@@ -47,13 +45,10 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
     Handler handler;
     private List<Place> places = new ArrayList<>();
     private MainActivityViewModel viewModel;
-    private boolean listofcinemasinitialized = false;
-    public static final String LOGSLOADWEBCONTENT = "LOGSLOADWEBCONTENT";
-    // To load content from the website
+    private boolean listOfCinemasInitialized = false;
     private static final String URL_CINEMAS = "https://datos.madrid.es/egob/catalogo/208862-7650046-ocio_salas.json";
     private static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
     private TextToSpeech mTTS;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +89,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                     if (viewModel.appShouldTalk) {
                         mTTS.speak("Choose a meeting point", TextToSpeech.QUEUE_FLUSH, null);
                     }
-                }else{
+                } else {
                     Toast.makeText(CreateMeetActivity.this,
                             "It was not possible to get content from the web",
                             Toast.LENGTH_LONG).show();
@@ -102,20 +97,17 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                 }
             }
         };
-        LoadWebContent loadURLContentsjson = new LoadWebContent(handler,CONTENT_TYPE_JSON, URL_CINEMAS);
+        LoadWebContent loadURLContentsjson = new LoadWebContent(handler, CONTENT_TYPE_JSON, URL_CINEMAS);
         es.execute(loadURLContentsjson);
         progressDialog.show();
-        //Obtiene referencia en Layout de WebView.
     }
 
     private void initCreateMeetActivity(String string_result){
-        if (listofcinemasinitialized == false) {
+        if (!listOfCinemasInitialized) {
             try {
                 JSONObject obj = new JSONObject(string_result);
-                // fetch JSONObject named employee
                 JSONArray graph = obj.getJSONArray("@graph");
                 for (int i = 0; i < graph.length(); i++) {
-                    // create a JSONObject for fetching single user data
                     JSONObject cinema = graph.getJSONObject(i);
                     String title = cinema.getString("title");
                     JSONObject location = cinema.getJSONObject("location");
@@ -131,7 +123,7 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
                         Toast.LENGTH_LONG).show();
                 finish();
             }
-            listofcinemasinitialized = true;
+            listOfCinemasInitialized = true;
         }
     }
 
@@ -153,14 +145,10 @@ public class CreateMeetActivity extends AppCompatActivity implements RecyclerVie
         intent.putExtra("placeName", place.getTitle());
         intent.putExtra("placeLatitude", place.getLatitude());
         intent.putExtra("placeLongitude", place.getLongitude());
+        intent.putExtra("nickname", getIntent().getStringExtra("nickname"));
         startActivity(intent);
     }
 }
-
-
-
-
-
 
 
 
