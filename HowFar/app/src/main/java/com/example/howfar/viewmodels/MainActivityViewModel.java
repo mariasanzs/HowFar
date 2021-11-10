@@ -7,19 +7,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.howfar.R;
-import com.example.howfar.activities.MainActivity;
 
 public class MainActivityViewModel extends AndroidViewModel implements SensorEventListener {
     private String userNickname;
@@ -64,6 +57,7 @@ public class MainActivityViewModel extends AndroidViewModel implements SensorEve
     }
 
     public void onSensorChanged(SensorEvent sensorEvent){
+        getSensorStatus();
         if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             if (sensorEvent.values[0] == 0) { //near
                 proxSensorIsNear.postValue(Boolean.valueOf(true));
