@@ -34,11 +34,6 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         setupMapFragment();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     private void clickConfirmMeeting(){
         toMeetActivity = new Intent(this ,MeetingActivity.class);
         toMeetActivity.putExtra("placeLatitude", lat);

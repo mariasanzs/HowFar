@@ -7,7 +7,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -17,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.IntentCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +29,7 @@ import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class MeetingActivity  extends AppCompatActivity
@@ -49,7 +47,6 @@ public class MeetingActivity  extends AppCompatActivity
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
     private Button finishButton;
-
 
     Intent intent;
     @Override
@@ -71,7 +68,7 @@ public class MeetingActivity  extends AppCompatActivity
         intent = getIntent();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new HistoryAdapter(new HashMap<>());
+        mAdapter = new HistoryAdapter(new ArrayList<>());
         mRecyclerView.setAdapter(mAdapter);
 
         setupMapFragment();
@@ -84,14 +81,13 @@ public class MeetingActivity  extends AppCompatActivity
             creator = false;
             meetId = intent.getStringExtra("idMeeting");
         }
-        viewModel.initalizeMqttClient(meetId);
+
         viewModel.setNickname(getIntent().getStringExtra("nickname"));
         viewModel.getParticipants()
-                .observe(this, participant -> onParticipantDistanceChanged(participant));
-        viewModel.getCurrentLocation()
-                .observe(this, location -> onLocationChanged(location));
+                .observe(this, newList -> onParticipantsListChanged(newList));
         viewModel.getPahoClientConnectionStatus()
                 .observe(this, status -> onPahoClientConnectionStatusChanged(status));
+        viewModel.initalizeMqttClient(meetId);
         fab.setOnClickListener(view -> sharingId());
     }
 
@@ -147,25 +143,15 @@ public class MeetingActivity  extends AppCompatActivity
         }
     }
 
-   private void onLocationChanged(Location location) {
-        Toast.makeText(this, location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT).show();
-    }
-
-    private void onParticipantDistanceChanged(Participant participant) {
-        // Añadir participant a la lista y refrescarla
-        String nickname = participant.nickname;
-        String distance = Integer.toString(participant.distanceToLocation);
-        mAdapter.add(nickname, distance + "m");
+    private void onParticipantsListChanged(ArrayList<Participant> newList) {
+        mAdapter.participantsList = newList;
         mAdapter.notifyDataSetChanged();
     }
 
     private void onMeetingPointLocationReceived(LatLng location) {
-        // Meter un toast
-        Log.d("PAHOJOIN","Meeting location recieved");
-        Toast.makeText(this,"Meeting location recieved",Toast.LENGTH_SHORT);
+        Log.d("HOWFARLOG","Meeting location recieved");
         mapFragment.setMarker(location);
-        viewModel.getCurrentLocation().removeObservers(this);
-    }
+     }
 
     private boolean isPermissionGranted(String[] grantPermissions, int[] grantResults,
                                               String permission) {
@@ -184,9 +170,10 @@ public class MeetingActivity  extends AppCompatActivity
                 longit = intent.getDoubleExtra("placeLongitude", 0);
                 viewModel.publishMeetingPointLocation(lat, longit);
             } else if (!viewModel.getMeetingPointLocation().hasObservers()) {
-                Log.d("PAHOJOIN", "ENTRA Aquí");
                 viewModel.getMeetingPointLocation()
                         .observe(this, latLng -> onMeetingPointLocationReceived(latLng));
+                Log.d("HOWFARLOG","Meeting activity has just started observing");
+
             }
             progressDialog.dismiss();
         } else {

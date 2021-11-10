@@ -78,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         joinIdField = findViewById(R.id.joinIdField);
         joinIdField.addTextChangedListener(this);
         joinIdField.setOnKeyListener(this);
-
-
     }
 
     private void showJoinForm() {
@@ -90,11 +88,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         nameField.setEnabled(false);
         createMeetButton.setEnabled(false);
         joinMeetButton.setEnabled(false);
-
-
     }
-
-
+    
     private void hideJoinForm() {
         joinMeetForm.setVisibility(View.GONE);
         tintView.setVisibility(View.GONE);
