@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.example.howfar.adapter.HistoryAdapter;
 import com.example.howfar.fragments.MapsFragment;
 import com.example.howfar.model.Participant;
 import com.example.howfar.paho.PahoClient;
+import com.example.howfar.viewmodels.MainActivityViewModel;
 import com.example.howfar.viewmodels.MeetingActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -47,6 +49,8 @@ public class MeetingActivity  extends AppCompatActivity
     RecyclerView mRecyclerView;
     FloatingActionButton fab;
     private Button finishButton;
+    private TextToSpeech mTTS;
+    private MainActivityViewModel viewModelMainActivity;
 
     Intent intent;
     @Override
@@ -146,6 +150,12 @@ public class MeetingActivity  extends AppCompatActivity
     private void onParticipantsListChanged(ArrayList<Participant> newList) {
         mAdapter.participantsList = newList;
         mAdapter.notifyDataSetChanged();
+        if (viewModelMainActivity.appShouldTalk) {
+            for(Participant p: newList) {
+                mTTS.speak(p.nickname + p.distanceToLocation + "meters", TextToSpeech.QUEUE_ADD, null);
+            }
+        }
+        
     }
 
     private void onMeetingPointLocationReceived(LatLng location) {
