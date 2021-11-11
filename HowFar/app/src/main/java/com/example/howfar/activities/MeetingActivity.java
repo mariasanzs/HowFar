@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.UUID;
 
 public class MeetingActivity  extends AppCompatActivity
@@ -50,7 +51,7 @@ public class MeetingActivity  extends AppCompatActivity
     FloatingActionButton fab;
     private Button finishButton;
     private TextToSpeech mTTS;
-    private MainActivityViewModel viewModelMainActivity;
+    private Boolean appShouldTalk;
 
     Intent intent;
     @Override
@@ -70,6 +71,25 @@ public class MeetingActivity  extends AppCompatActivity
 
         requestLocationPermissions();
         intent = getIntent();
+
+        appShouldTalk = intent.getBooleanExtra("appShouldTalk", false);
+        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if(i == TextToSpeech.SUCCESS){
+                    int result = mTTS.setLanguage(Locale.ENGLISH);
+                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                        Log.e("TTS", "Language not suported");
+                    }else{
+                        //if everything is succesful
+                        mTTS.setPitch(0.5f);
+                        mTTS.setSpeechRate(0.5f);
+                    }
+                }else{
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new HistoryAdapter(new ArrayList<>());
@@ -149,13 +169,12 @@ public class MeetingActivity  extends AppCompatActivity
 
     private void onParticipantsListChanged(ArrayList<Participant> newList) {
         mAdapter.participantsList = newList;
-        mAdapter.notifyDataSetChanged();
-        if (viewModelMainActivity.appShouldTalk) {
-            for(Participant p: newList) {
+        if (appShouldTalk) {
+            for (Participant p : newList) {
                 mTTS.speak(p.nickname + p.distanceToLocation + "meters", TextToSpeech.QUEUE_ADD, null);
             }
         }
-        
+        mAdapter.notifyDataSetChanged();
     }
 
     private void onMeetingPointLocationReceived(LatLng location) {
