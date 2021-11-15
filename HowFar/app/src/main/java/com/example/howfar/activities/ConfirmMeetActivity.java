@@ -29,6 +29,7 @@ public class ConfirmMeetActivity extends AppCompatActivity {
     private String nickname;
     private TextToSpeech mTTS;
     private MainActivityViewModel viewModel;
+    private Boolean appShouldTalk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +63,10 @@ public class ConfirmMeetActivity extends AppCompatActivity {
     }
 
     private void clickConfirmMeeting(){
+        appShouldTalk = false;
         if (viewModel.appShouldTalk) {
-            mTTS.speak("Meeting confirmed at " + placeTitle, TextToSpeech.QUEUE_FLUSH, null);
+            mTTS.speak("Meeting confirmed at " + placeTitle, TextToSpeech.QUEUE_ADD, null);
+            appShouldTalk = true;
         }
         toMeetActivity = new Intent(this ,MeetingActivity.class);
         toMeetActivity.putExtra("placeLatitude", lat);
@@ -71,6 +74,7 @@ public class ConfirmMeetActivity extends AppCompatActivity {
         toMeetActivity.putExtra("placeName",placeTitle);
         toMeetActivity.putExtra("meetingCreator",true);
         toMeetActivity.putExtra("nickname", getIntent().getStringExtra("nickname"));
+        toMeetActivity.putExtra("appShouldTalk", appShouldTalk);
         startActivity(toMeetActivity);
     }
 
