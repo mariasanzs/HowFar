@@ -32,7 +32,7 @@ The architecture and design of the application is included in the following sche
 The documentation about the design of the application is included [here](https://github.com/mariasanzs/HowFar/blob/main/docs/design.md)
 
 ## Presentation 🖥️
-You can see the full presentation [here](https://www.canva.com/design/DAE2eYOXRpI/ODA3DVH978nal-W1eKx4LA/view?utm_content=DAE2eYOXRpI&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink)
+You can see the full presentation [here](https://docs.google.com/presentation/d/1cufqDu3xwIwoQVregW24uNMetytt8F1VDQbiv69lwk8/edit?usp=sharing)
 
 ### Authors 🖋️👩🏻‍💻👨🏻‍💻
 Carlos Clemente Martín | María Martín Peral | María Sanz Sánchez | Paulo Seoane Davila
